@@ -1,0 +1,86 @@
+server:
+  port: 8080
+spring:
+  profiles:
+    active: dev
+  devtools:
+    restart:
+      enabled: true
+  mvc:
+    static-path-pattern: /static/**
+  thymeleaf:
+    mode: HTML5
+    prefix: classpath:/templates/
+    suffix: .html
+    #指定编码
+    encoding: utf-8
+    #禁用缓存 默认false
+    cache: false
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+#  rabbitmq:
+#    host: localhost
+#    port: 5672
+#    username: guest
+#    password: guest
+#    listener:
+#      simple:
+#        concurrency: 10
+#        max-concurrency: 20
+#        prefetch: 5
+#  kafka:
+#    bootstrap-servers: 127.0.0.1:9092
+#    producer:
+#      retries: 0
+#      batch-size: 16384
+#      buffer-memory: 33554432
+#      acks: 1
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+#    consumer:
+#      group-id: testGroup
+#      auto-offset-reset: earliest
+#      enable-auto-commit: true
+#      auto-commit-interval: 100
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  #quartz:
+  #  properties:
+  #    org:
+  #      quartz:
+  #        scheduler:
+  #          instanceName: clusteredScheduler
+  #          instanceId: AUTO
+  #        jobStore:
+  #          class: org.quartz.impl.jdbcjobstore.JobStoreTX
+  #          driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+  #          tablePrefix: QRTZ_
+  #          isClustered: true
+  #          clusterCheckinInterval: 10000
+  #          useProperties: false
+  #        threadPool:
+  #          class: org.quartz.simpl.SimpleThreadPool
+  #          threadCount: 10
+  #          threadPriority: 5
+  #          threadsInheritContextClassLoaderOfInitializingThread: true
+  #  job-store-type: jdbc
+  #  jdbc:
+  #    initialize-schema: never
+mybatis:
+  mapper-locations: classpath:mapping/*.xml
+  type-aliases-package: com.system.springbootV1.model
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+logging:
+  config: classpath:logback-spring.xml
+path:
+  log: logs
+

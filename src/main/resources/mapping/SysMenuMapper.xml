@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.system.springbootv1.dao.ISysMenuDao">
+    <resultMap id="SysMenu" type="com.system.springbootv1.model.SysMenu">
+        <id column="Id" jdbcType="VARCHAR" property="Id"/>
+        <result column="Name" jdbcType="VARCHAR" property="name"/>
+        <result column="Description" jdbcType="VARCHAR" property="description"/>
+        <result column="Url" jdbcType="VARCHAR" property="url"/>
+        <result column="IsBlank" jdbcType="INTEGER" property="isBlank"/>
+        <result column="PId" jdbcType="VARCHAR" property="pId"/>
+        <result column="Icon" jdbcType="VARCHAR" property="icon"/>
+        <result column="Perms" jdbcType="VARCHAR" property="perms"/>
+        <result column="Type" jdbcType="INTEGER" property="type"/>
+        <result column="Order" jdbcType="INTEGER" property="order"/>
+        <result column="Visible" jdbcType="INTEGER" property="visible"/>
+        <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="ModifyTime" jdbcType="TIMESTAMP" property="modifyTime"/>
+        <result column="childCount" jdbcType="INTEGER" property="childCount"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        `Id`, `Name`, `Description`, `Url`,`IsBlank`,`PId`,`Perms`,`Type`,`Icon`,`Order`,`Visible`, `CreateTime`, `ModifyTime`
+    </sql>
+    <insert id="insert" parameterType="com.system.springbootv1.model.SysMenu">
+        insert into sys_menu (<include refid="Base_Column_List"/>)
+        values (
+        #{Id,jdbcType=VARCHAR},
+        #{name,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR},
+        #{url,jdbcType=VARCHAR},
+        #{isBlank,jdbcType=INTEGER},
+        #{pId,jdbcType=VARCHAR},
+        #{perms,jdbcType=VARCHAR},
+        #{type,jdbcType=INTEGER},
+        #{icon,jdbcType=VARCHAR},
+        #{order,jdbcType=INTEGER},
+        #{visible,jdbcType=INTEGER},
+        #{createTime,jdbcType=TIMESTAMP},
+        #{modifyTime,jdbcType=TIMESTAMP})
+    </insert>
+    <update id="update" parameterType="com.system.springbootv1.model.SysMenu">
+        update sys_menu
+        <set>
+            <if test="name != null">
+                `Name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                `Description` = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                `Url` = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="isBlank != null">
+                `IsBlank` = #{isBlank,jdbcType=INTEGER},
+            </if>
+            <if test="pId != null">
+                `PId` = #{pId,jdbcType=VARCHAR},
+            </if>
+            <if test="icon != null">
+                `Icon` = #{icon,jdbcType=VARCHAR},
+            </if>
+            <if test="perms != null">
+                `Perms` = #{perms,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                `Type` = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="order != null">
+                `Order` = #{order,jdbcType=INTEGER},
+            </if>
+            <if test="visible != null">
+                `Visible` = #{visible,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                `CreateTime` = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                `ModifyTime` = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where Id = #{id,jdbcType=VARCHAR}
+    </update>
+    <delete id="deleteByIds" parameterType="java.util.List">
+        delete from `sys_menu`
+        where `Id` in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+
+    </delete>
+    <select id="getMenuByUserId" parameterType="java.lang.String" resultMap="SysMenu">
+        select
+        menu.*, (SELECT count(1)FROM sys_menu WHERE PId = menu.Id) as childCount
+        from sys_menu menu
+        <if test="userId != 1 and userId != null">
+            left join sys_permission permission on menu.Id = permission.MenuId
+            LEFT JOIN sys_role role on permission.RoleId = role.Id
+            LEFT JOIN sys_role_user roleuser on role.Id = roleuser.RoleId
+            left join sys_user user on roleuser.UserId = user.Id
+            where menu.Type != 2
+            and user.Id = #{userId,jdbcType=VARCHAR}
+        </if>
+        order by menu.Order asc
+    </select>
+
+    <select id="list" parameterType="java.util.Map" resultMap="SysMenu">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_menu`
+        where 1=1
+        order by `Order` asc
+    </select>
+    <select id="getById" parameterType="java.lang.String" resultMap="SysMenu">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_menu`
+        where `Id` = #{id,jdbcType=VARCHAR}
+    </select>
+    <select id="getByPId" parameterType="java.lang.String" resultMap="SysMenu">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_menu`
+        where `PId` = #{pid,jdbcType=VARCHAR}
+    </select>
+    <select id="getMenuByRole" parameterType="java.lang.String" resultType="java.lang.String">
+        select `MenuId`
+        from `sys_permission`
+        where `RoleId` = #{roleId,jdbcType=VARCHAR}
+    </select>
+</mapper>

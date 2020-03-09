@@ -1,0 +1,3 @@
+使用druid-1.1.21.jar 加密密码：
+到jar包所在路径执行以下命令
+java -cp druid-1.1.21.jar com.alibaba.druid.filter.config.ConfigTools 密码
