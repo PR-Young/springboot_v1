@@ -1,0 +1,43 @@
+public-key: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJMKPVHYRh6inLK5zn4LaXQuBCeiLmtonqRVoiJOPOCNXWLCjwyz7tA7SeIUKAI970dRPXAgB4qKnlw0KKR/wisCAwEAAQ==
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      db-type: mysql
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/springbootv1?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+      username: root
+      password: MZnC0SMIlW3+Pat1CqL1U8Mv7Fw8n2D/RMMWHPzT3mzvcbhtNlAsnaDSSmVLIJs3zGjjYcGxoKEhCO6uiTFDMw==
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      time-between-eviction-runs-millis: 2000
+      min-evictable-idle-time-millis: 600000
+      max-evictable-idle-time-millis: 900000
+      remove-abandoned: true
+      remove-abandoned-timeout-millis: 1800
+      validation-query: SELECT 1 FROM DURL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      connection-properties: config.decrypt=true;config.decrypt.key=${public-key};druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 50
+      filters: stat,wall,slf4j,config
+      web-stat-filter:
+        enabled: true
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
+      stat-view-servlet:
+        enabled: true
+        reset-enable: false
+        url-pattern: /druid/*
+        login-username: admin
+        login-password: admin
+      filter:
+        slf4j:
+          enable: true
+          statement-create-after-log-enabled: false
+          statement-close-after-log-enabled: false
+          result-set-open-after-log-enabled: false
+          result-set-close-after-log-enabled: false
