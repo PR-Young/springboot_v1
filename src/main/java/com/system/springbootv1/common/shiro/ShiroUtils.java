@@ -93,9 +93,6 @@ public class ShiroUtils {
 
     /**
      * 获取登录用户name
-     * @return
-     * @author fuce
-     * @Date 2019年11月21日 上午9:58:48
      */
     public static String getLoginName()
     {

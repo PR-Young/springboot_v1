@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 自定义拦截器
- * @author fc
  *
  */
 public class MyInterceptor  implements HandlerInterceptor {

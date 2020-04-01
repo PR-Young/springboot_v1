@@ -58,4 +58,12 @@ public class BaseResult extends HashMap<String, Object> {
         json.put("data", value);
         return json;
     }
+
+    public static BaseResult result(int code, String msg, Object value) {
+        BaseResult baseResult = new BaseResult();
+        baseResult.put("code", code);
+        baseResult.put("msg", msg);
+        baseResult.put("data", value);
+        return baseResult;
+    }
 }

@@ -250,6 +250,14 @@
                     btnclass: ["btn btn-primary"],
                 })
             },
+            exceptionAlert: function (msg, content, type) {
+                layer.alert(content, {
+                    icon: $.modal.icon(type),
+                    title: msg,
+                    btn: ["确认"],
+                    btnclass: ["btn btn-primary"],
+                })
+            },
             msgReload: function (msg, type) {
                 layer.msg(msg, {
                     icon: $.modal.icon(type),
@@ -267,6 +275,9 @@
             },
             alertWarning: function (content) {
                 $.modal.alert(content, modal_status.WARNING);
+            },
+            exception: function (msg, content) {
+                $.modal.exceptionAlert(msg,content,modal_status.FAIL);
             },
             close: function () {
                 var index = parent.layer.getFrameIndex(window.name);

@@ -56,6 +56,7 @@ public class LogAspect {
 
     @Async
     public void handleLog(JoinPoint joinPoint, Exception e) {
+        SysLog sysLog = new SysLog();
         try {
             MethodSignature signature = (MethodSignature) joinPoint.getSignature();
             Method method = signature.getMethod();
@@ -65,7 +66,7 @@ public class LogAspect {
             }
             String url = ServletUtils.getRequest().getRequestURI();
             String ip = getRealIp(ServletUtils.getRequest());
-            SysLog sysLog = new SysLog();
+
             SysUser currentUser = ShiroUtils.getUser();
             if (null != currentUser) {
                 sysLog.setHostIp(ip);
@@ -74,28 +75,32 @@ public class LogAspect {
                 if (null != e) {
                     sysLog.setNotes(StringUtils.substring(e.getMessage(), 0, 2000));
                 }
-                sysLogService.insert(sysLog);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            sysLogService.insert(sysLog);
         }
     }
 
     public String getRealIp(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
-
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("WL-Proxy-Client-IP");
         }
-
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_IP");
+        }
+        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
-
-        return ip;
+        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
     }
 
 }

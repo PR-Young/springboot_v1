@@ -178,7 +178,11 @@
                         $.modal.alertError("系统错误");
                     },
                     success: function (data) {
-                        $.operate.saveSuccess(data);
+                        if (data.code == 1001) {
+                            $.modal.exceptionAlert(data.msg, data.data);
+                        } else {
+                            $.operate.saveSuccess(data);
+                        }
                     }
                 });
             }
