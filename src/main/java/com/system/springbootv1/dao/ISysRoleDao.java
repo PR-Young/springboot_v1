@@ -9,7 +9,7 @@ import java.util.Map;
  * @description:
  * @author: yy 2020/01/25
  **/
-public interface ISysRoleDao extends BaseDao<SysRole> {
+public interface ISysRoleDao extends IBaseDao<SysRole> {
     List<SysRole> getRoleByUserId(String userId);
 
     List<String> getPermsByRoleId(String roleId);

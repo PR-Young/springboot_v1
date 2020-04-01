@@ -9,7 +9,7 @@ import java.util.List;
  * @description:
  * @author: yy 2020/01/22
  **/
-public interface ISysUserDao extends BaseDao<SysUser> {
+public interface ISysUserDao extends IBaseDao<SysUser> {
 
     SysUser getUserByName(String userName);
 

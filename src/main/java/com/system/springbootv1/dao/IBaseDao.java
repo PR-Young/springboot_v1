@@ -9,7 +9,7 @@ import java.util.Map;
  * @description:
  * @author: yy 2020/01/22
  **/
-public interface BaseDao<T> {
+public interface IBaseDao<T> {
     int insert(T obj);
 
     int update(T obj);

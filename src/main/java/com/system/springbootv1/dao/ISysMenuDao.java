@@ -8,7 +8,7 @@ import java.util.List;
  * @description:
  * @author: yy 2020/01/23
  **/
-public interface ISysMenuDao extends BaseDao<SysMenu> {
+public interface ISysMenuDao extends IBaseDao<SysMenu> {
 
     List<SysMenu> getMenuByUserId(String userId);
 
