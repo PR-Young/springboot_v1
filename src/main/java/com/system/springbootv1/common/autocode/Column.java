@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author: yy 2020/03/31
  **/
 @Data
-public class Coloum implements Serializable {
+public class Column implements Serializable {
     /**
      * 属性注解
      */

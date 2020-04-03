@@ -41,7 +41,6 @@ public class FreeMarkerGeneratorUtil {
     public static void generatorMvcCode(String driver, String url, String user, String pwd, String tableName, String databaseName,
                                         String tablePrefix, int generateLevel, String basePackage, String daoPackage, String xmlDir, String servicePackage,
                                         String controllerPackage) {
-
         Connection con = null;
         //注册驱动
         try {
@@ -51,23 +50,18 @@ public class FreeMarkerGeneratorUtil {
             log.error("获取数据连接失败，{}", e.getMessage());
             return;
         }
-
         //查询dbName所有表
         String sql = "select table_name from information_schema.tables where table_schema='" + databaseName + "'";
-
         //获取当前项目路径
         String path = FreeMarkerGeneratorUtil.class.getResource("/").getPath();
         path = StrUtil.sub(path, 1, path.indexOf("/target"));
-
         log.info("当前项目路径为：{}", path);
         String parentProjectPath = StrUtil.sub(path, 0, path.lastIndexOf("/"));
         //获取模板路径
         String templatePath = path + "/src/main/java/com/system/springbootv1/common/templates";
         log.info("当前模板路径为：{}", templatePath);
-
         boolean onlySingleTable = StrUtil.isNotBlank(tableName);
         try {
-
             PreparedStatement ps = con.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -80,75 +74,20 @@ public class FreeMarkerGeneratorUtil {
                 String controllerDir = null;
                 //根据实体包名创建目录
                 if (generateLevel > 0) {
-                    File[] ls = FileUtil.ls(parentProjectPath);
-                    for (File f : ls) {
-                        String currModule = f.toString();
-                        boolean matches = currModule.matches("(.*?model.*?)|(.*?domain.*?)|(.*?entity.*?)");
-                        if (f.isDirectory() && matches) {
-                            entityDir = f.toString() + "/src/main/java/" + basePackage.replace(".", "/");
-                            break;
-                        }
-                    }
-                    if (StrUtil.isBlank(entityDir)) {
-                        entityDir = path + "/src/main/java/" + basePackage.replace(".", "/");
-                    }
-                    if (!FileUtil.exist(entityDir)) {
-                        FileUtil.mkdir(entityDir);
-                        log.info("创建目录：{} 成功！ ", entityDir);
-                    }
-                    for (File f : ls) {
-                        String currModule = f.toString();
-                        boolean matches = currModule.matches("(.*?dao.*?)|(.*?mapper.*?)");
-                        if (f.isDirectory() && matches) {
-                            daoDir = f.toString() + "/src/main/java/" + daoPackage.replace(".", "/");
-                            break;
-                        }
-                    }
-                    if (StrUtil.isBlank(daoDir)) {
-                        daoDir = path + "/src/main/java/" + daoPackage.replace(".", "/");
-                    }
-                    if (!FileUtil.exist(daoDir)) {
-                        FileUtil.mkdir(daoDir);
-                        log.info("创建目录：{} 成功！ ", daoDir);
-                    }
-                    for (File f : ls) {
-                        String currModule = f.toString();
-                        boolean matches = currModule.matches("(.*?service.*?)");
-                        if (f.isDirectory() && matches) {
-                            serviceDir = f.toString() + "/src/main/java/" + servicePackage.replace(".", "/");
-                            break;
-                        }
-                    }
-                    if (StrUtil.isBlank(serviceDir)) {
-                        serviceDir = path + "/src/main/java/" + servicePackage.replace(".", "/");
-                    }
-                    if (!FileUtil.exist(serviceDir)) {
-                        FileUtil.mkdir(serviceDir);
-                        log.info("创建目录：{} 成功！ ", serviceDir);
-                    }
-                    for (File f : ls) {
-                        String currModule = f.toString();
-                        boolean matches = currModule.matches("(.*?controller.*?)");
-                        if (f.isDirectory() && matches) {
-                            controllerDir = f.toString() + "/src/main/java/" + controllerPackage.replace(".", "/");
-                            break;
-                        }
-                    }
-                    if (StrUtil.isBlank(controllerDir)) {
-                        controllerDir = path + "/src/main/java/" + controllerPackage.replace(".", "/");
-                    }
-                    if (!FileUtil.exist(controllerDir)) {
-                        FileUtil.mkdir(controllerDir);
-                        log.info("创建目录：{} 成功！ ", controllerDir);
-                    }
+                    entityDir = createDir(parentProjectPath, path, basePackage, "(.*?model.*?)");
+                    daoDir = createDir(parentProjectPath, path, daoPackage, "(.*?dao.*?)");
+                    serviceDir = createDir(parentProjectPath, path, servicePackage, "(.*?service.*?)");
+                    controllerDir = createDir(parentProjectPath, path, controllerPackage, "(.*?controller.*?)");
                 }
-                EntityDataModel entityModel = getEntityModel(con, tableName, basePackage,daoPackage,servicePackage,controllerPackage, tablePrefix);
-                //生成每个表实体
-                generateCode(entityModel, templatePath, "Entity.ftl", entityDir, "",".java");
-                //创建mapperxml路径
-
+                EntityDataModel entityModel = getEntityModel(con, tableName, basePackage, daoPackage, servicePackage, controllerPackage, tablePrefix);
+                //生成java文件
+                generateCode(entityModel, templatePath, "Entity.ftl", entityDir, "", ".java");
+                generateCode(entityModel, templatePath, "EntityDao.ftl", daoDir, "I", "Dao.java");
+                generateCode(entityModel, templatePath, "EntityService.ftl", serviceDir, "", "Service.java");
+                generateCode(entityModel, templatePath, "EntityController.ftl", controllerDir, "", "Controller.java");
+                //创建mapper路径
                 String mapperxmlPath = null;
-                //根据实体包名创建目录
+                //根据创建xml目录
                 if (StrUtil.isNotBlank(xmlDir)) {
                     mapperxmlPath = path + xmlDir.replace(".", "/");
                     if (!FileUtil.exist(mapperxmlPath)) {
@@ -157,23 +96,35 @@ public class FreeMarkerGeneratorUtil {
                 } else {
                     mapperxmlPath = entityDir;
                 }
-                generateCode(entityModel, templatePath, "EntityMapper.ftl", mapperxmlPath, "","Mapper.xml");
-
-                generateCode(entityModel, templatePath, "EntityDao.ftl", daoDir, "I","Dao.java");
-
-                generateCode(entityModel, templatePath, "EntityService.ftl", serviceDir, "","Service.java");
-
-                generateCode(entityModel, templatePath, "EntityController.ftl", controllerDir, "","Controller.java");
-
+                generateCode(entityModel, templatePath, "EntityMapper.ftl", mapperxmlPath, "", "Mapper.xml");
                 if (onlySingleTable) {
                     return;
                 }
             }
-
         } catch (Exception e) {
             log.error("代码生成出错 {}", e.getMessage());
         }
+    }
 
+    private static String createDir(String parentProjectPath, String path, String pack, String regex) {
+        String dir = null;
+        File[] ls = FileUtil.ls(parentProjectPath);
+        for (File f : ls) {
+            String currModule = f.toString();
+            boolean matches = currModule.matches(regex);
+            if (f.isDirectory() && matches) {
+                dir = f.toString() + "/src/main/java/" + pack.replace(".", "/");
+                break;
+            }
+        }
+        if (StrUtil.isBlank(dir)) {
+            dir = path + "/src/main/java/" + pack.replace(".", "/");
+        }
+        if (!FileUtil.exist(dir)) {
+            FileUtil.mkdir(dir);
+            log.info("创建目录：{} 成功！ ", dir);
+        }
+        return dir;
     }
 
     private static EntityDataModel getEntityModel(Connection con, String tableName, String basePackage, String daoPackage, String servicePackage,
@@ -186,9 +137,9 @@ public class FreeMarkerGeneratorUtil {
         PreparedStatement ps = con.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
 
-        List<Coloum> columns = new ArrayList<>();
+        List<Column> columns = new ArrayList<>();
         while (rs.next()) {
-            Coloum col = new Coloum();
+            Column col = new Column();
             String name = rs.getString("column_name");
             String type = rs.getString("column_type");
             String comment = rs.getString("column_comment");
@@ -223,26 +174,26 @@ public class FreeMarkerGeneratorUtil {
         return dataModel;
     }
 
-    private static String handleSQL(List<Coloum> coloums, String flag) {
+    private static String handleSQL(List<Column> columns, String flag) {
         StringBuffer sb = new StringBuffer();
         switch (flag) {
             case "columnList":
-                for (Coloum coloum : coloums) {
-                    sb.append("`").append(coloum.getColumnName()).append("`,");
+                for (Column column : columns) {
+                    sb.append("`").append(column.getColumnName()).append("`,");
                 }
                 break;
             case "insert":
                 sb.append("#{Id,jdbcType=VARCHAR},\n");
-                for (Coloum coloum : coloums) {
-                    sb.append("#{").append(coloum.getColumnName()).append(",jdbcType=").append(coloum.getJdbcType()).append("},\n");
+                for (Column column : columns) {
+                    sb.append("#{").append(column.getColumnName()).append(",jdbcType=").append(column.getJdbcType()).append("},\n");
                 }
                 sb.append("#{createTime,jdbcType=TIMESTAMP},\n").append("#{modifyTime,jdbcType=TIMESTAMP}");
                 break;
             case "update":
-                for (Coloum coloum : coloums) {
-                    sb.append("<if test=\"").append(coloum.getName()).append("!= null\">\n")
-                            .append("`").append(coloum.getColumnName()).append("`=#{").append(coloum.getName()).append(",jdbcType=")
-                            .append(coloum.getJdbcType()).append("},").append("\n")
+                for (Column column : columns) {
+                    sb.append("<if test=\"").append(column.getName()).append("!= null\">\n")
+                            .append("`").append(column.getColumnName()).append("`=#{").append(column.getName()).append(",jdbcType=")
+                            .append(column.getJdbcType()).append("},").append("\n")
                             .append("</if>\n");
                 }
                 sb.append("<if test=\"createTime != null\">\n")
@@ -258,9 +209,8 @@ public class FreeMarkerGeneratorUtil {
         return sb.toString();
     }
 
-    private static void generateCode(EntityDataModel dataModel, String templatePath, String templateName, String outDir,String filePrefix, String fileSuffix)
+    private static void generateCode(EntityDataModel dataModel, String templatePath, String templateName, String outDir, String filePrefix, String fileSuffix)
             throws IOException, TemplateException {
-
         if (fileSuffix.contains("xml")) {
             dataModel.setInsertValue(handleSQL(dataModel.getColumns(), "insert"));
             dataModel.setUpdateValue(handleSQL(dataModel.getColumns(), "update"));
@@ -269,7 +219,7 @@ public class FreeMarkerGeneratorUtil {
 
         String file = outDir + "/" + filePrefix + dataModel.getEntityName() + fileSuffix;
         if (FileUtil.exist(file)) {
-            log.info("文件：{} 已存在，如需覆盖请先对该文件进行");
+            log.info("文件：{} 已存在，如需覆盖请先对该文件进行", file);
             return;
         }
         //获取模板对象

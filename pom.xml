@@ -9,11 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.system</groupId>
-    <artifactId>springboot_v1</artifactId>
-    <version>0.0.1</version>
+    <artifactId>springboot-ares</artifactId>
+    <version>v1</version>
     <packaging>jar</packaging>
-    <name>springboot_v1</name>
-    <description>Demo project for Spring Boot</description>
+    <name>springboot-ares</name>
+    <description>springboot-ares</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -46,6 +46,11 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
@@ -69,12 +74,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.vintage</groupId>
-                    <artifactId>junit-vintage-engine</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>

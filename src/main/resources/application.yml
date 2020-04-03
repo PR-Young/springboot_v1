@@ -63,3 +63,25 @@ logging:
 path:
   log: logs
 
+ares:
+  base:
+    name: ares
+    version: 1.0.0
+    copyright: 2020-${ares.base.name}-${ares.base.version}
+  codegenerator:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/springbootv1?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    username: root
+    password: root
+    databaseName: springbootv1
+    tableName: test_v
+    tablePrefix:
+    genenaterLevel: 1
+    basePackage: com.system.springbootv1.model
+    daoPackage: com.system.springbootv1.dao
+    xmlDir: .src.main.resources.mapping
+    servicePackage: com.system.springbootv1.service
+    controllerPackage: com.system.springbootv1.controller
+
+
+

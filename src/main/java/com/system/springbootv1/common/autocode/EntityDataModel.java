@@ -51,7 +51,7 @@ public class EntityDataModel {
     /**
      * 字段集合
      */
-    private List<Coloum> columns;
+    private List<Column> columns;
 
     private String strColumn;
 
