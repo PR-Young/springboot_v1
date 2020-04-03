@@ -29,7 +29,6 @@ public class IndexController {
         BootstrapTree bootstrapTree = sysMenuService.getBootstrapTree(ShiroUtils.getUserId());
         request.getSession().setAttribute("bootstrapTree", bootstrapTree);
         request.getSession().setAttribute("userName", ShiroUtils.getUser().getUserName());
-        request.getSession().setAttribute("service", new Service());
         return "index";
     }
 
@@ -98,6 +97,13 @@ public class IndexController {
     @RequestMapping("/message")
     public String message(HttpServletRequest request) {
         return "/message/message";
+    }
+
+    @ApiOperation(value = "服务器信息类", notes = "服务器信息类")
+    @RequestMapping("/service")
+    public String service(HttpServletRequest request) {
+        request.getSession().setAttribute("service", new Service());
+        return "/sys/service";
     }
 
 }
