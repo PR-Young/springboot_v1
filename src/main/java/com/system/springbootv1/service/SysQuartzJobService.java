@@ -47,16 +47,22 @@ public class SysQuartzJobService implements BaseService<SysQuartzJob> {
         obj.setId(SnowflakeIdWorker.getUUID());
         obj.setCreateTime(new Date());
         sysQuartzJobDao.insert(obj);
+        scheduler.addJob(obj);
     }
 
     @Override
     public void update(SysQuartzJob obj) {
         obj.setModifyTime(new Date());
         sysQuartzJobDao.update(obj);
+        scheduler.edit(obj);
     }
 
     @Override
     public void deleteByIds(List<String> ids) {
+        for (String id : ids) {
+            SysQuartzJob job = getById(id);
+            scheduler.delete(scheduler.createTaskName(job.getJobName()), job.getJobGroup());
+        }
         sysQuartzJobDao.deleteByIds(ids);
     }
 
@@ -78,7 +84,7 @@ public class SysQuartzJobService implements BaseService<SysQuartzJob> {
         job.setStatus(ScheduleConstants.Status.NORMAL.getValue());
         int rows = sysQuartzJobDao.update(job);
         if (rows > 0) {
-            scheduler.start(ScheduleConstants.TASK_CLASS_NAME + job.getId(), job.getJobGroup());
+            scheduler.start(scheduler.createTaskName(job.getJobName()), job.getJobGroup());
         }
         return rows;
     }
@@ -88,7 +94,7 @@ public class SysQuartzJobService implements BaseService<SysQuartzJob> {
         job.setStatus(ScheduleConstants.Status.PAUSE.getValue());
         int rows = sysQuartzJobDao.update(job);
         if (rows > 0) {
-            scheduler.pause(ScheduleConstants.TASK_CLASS_NAME + job.getId(), job.getJobGroup());
+            scheduler.pause(scheduler.createTaskName(job.getJobName()), job.getJobGroup());
         }
         return rows;
     }

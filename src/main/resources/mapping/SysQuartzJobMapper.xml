@@ -5,16 +5,16 @@
     <id column="Id" jdbcType="VARCHAR" property="id" />
     <result column="JobName" jdbcType="VARCHAR" property="jobName" />
     <result column="JobGroup" jdbcType="VARCHAR" property="jobGroup" />
+    <result column="Description" jdbcType="VARCHAR" property="description" />
     <result column="InvokeTarget" jdbcType="VARCHAR" property="invokeTarget" />
     <result column="CronExpression" jdbcType="VARCHAR" property="cronExpression" />
-    <result column="MisfirePolicy" jdbcType="VARCHAR" property="misfirePolicy" />
     <result column="ConCurrent" jdbcType="VARCHAR" property="conCurrent" />
     <result column="Status" jdbcType="INTEGER" property="status" />
     <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
     <result column="ModifyTime" jdbcType="TIMESTAMP" property="modifyTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    Id, JobName, JobGroup, InvokeTarget, CronExpression, MisfirePolicy, ConCurrent, Status, 
+    Id, JobName, JobGroup, Description, InvokeTarget, CronExpression, ConCurrent, Status,
     CreateTime, ModifyTime
   </sql>
   <select id="list" parameterType="java.util.Map" resultMap="SysQuartzJob">
@@ -46,12 +46,12 @@
     </foreach>
   </delete>
   <insert id="insert" parameterType="com.system.springbootv1.model.SysQuartzJob">
-    insert into sys_quartz_job (Id, JobName, JobGroup, 
-      InvokeTarget, CronExpression, MisfirePolicy, 
+    insert into sys_quartz_job (Id, JobName, JobGroup, Description,
+      InvokeTarget, CronExpression,
       ConCurrent, Status, CreateTime, 
       ModifyTime)
     values (#{id,jdbcType=VARCHAR}, #{jobName,jdbcType=VARCHAR}, #{jobGroup,jdbcType=VARCHAR},
-      #{invokeTarget,jdbcType=VARCHAR}, #{cronExpression,jdbcType=VARCHAR}, #{misfirePolicy,jdbcType=VARCHAR},
+      #{description,jdbcType=VARCHAR},#{invokeTarget,jdbcType=VARCHAR}, #{cronExpression,jdbcType=VARCHAR},
       #{conCurrent,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
       #{modifyTime,jdbcType=TIMESTAMP})
   </insert>
@@ -64,14 +64,14 @@
       <if test="jobGroup != null">
         JobGroup = #{jobGroup,jdbcType=VARCHAR},
       </if>
+      <if test="description != null">
+        Description = #{description,jdbcType=VARCHAR},
+      </if>
       <if test="invokeTarget != null">
         InvokeTarget = #{invokeTarget,jdbcType=VARCHAR},
       </if>
       <if test="cronExpression != null">
         CronExpression = #{cronExpression,jdbcType=VARCHAR},
-      </if>
-      <if test="misfirePolicy != null">
-        MisfirePolicy = #{misfirePolicy,jdbcType=VARCHAR},
       </if>
       <if test="conCurrent != null">
         ConCurrent = #{conCurrent,jdbcType=VARCHAR},

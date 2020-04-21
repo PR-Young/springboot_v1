@@ -6,7 +6,7 @@ package com.system.springbootv1.common.quartz;
  */
 public interface ScheduleConstants
 {
-    public static final String TASK_CLASS_NAME = "TASK_CLASS_NAME";
+    public static final String TASK_CLASS_NAME = "TASK_CLASS_NAME_";
 
     /** 执行目标key */
     public static final String TASK_PROPERTIES = "TASK_PROPERTIES";

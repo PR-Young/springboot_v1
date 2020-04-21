@@ -33,15 +33,9 @@ public class ScheduleManager {
                 try {
                     if (ScheduleConstants.Status.NORMAL.getValue().equals(job.getStatus())) {
                         if (checkJobExist(job)) {
-                            delete(ScheduleConstants.TASK_CLASS_NAME + job.getId(), job.getJobGroup());
+                            delete(createTaskName(job.getJobName()), job.getJobGroup());
                         }
-                        addJob(ScheduleConstants.TASK_CLASS_NAME + job.getId(),
-                                job.getJobGroup(),
-                                getQuartzJobClass(job),
-                                false,
-                                job.getCronExpression(),
-                                10,
-                                job);
+                        addJob(job);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -60,6 +54,27 @@ public class ScheduleManager {
     private static Class<? extends Job> getQuartzJobClass(SysQuartzJob sysJob) {
         boolean isConcurrent = "0".equals(sysJob.getConCurrent());
         return isConcurrent ? QuartzJobExecution.class : QuartzDisallowConcurrentExecution.class;
+    }
+
+    public void addJob(SysQuartzJob job) {
+        addJob(createTaskName(job.getJobName()),
+                job.getJobGroup(),
+                getQuartzJobClass(job),
+                false,
+                job.getCronExpression(),
+                10,
+                job);
+
+    }
+
+    public void edit(SysQuartzJob job) {
+        modify("1",
+                createTaskName(job.getJobName()),
+                job.getJobGroup(),
+                createTaskName(job.getJobName()) + ScheduleConstants.TRIGGER,
+                job.getJobGroup() + ScheduleConstants.TRIGGER_GROUP,
+                job.getCronExpression(),
+                job);
     }
 
     /**
@@ -110,9 +125,13 @@ public class ScheduleManager {
          * 4.使用Scheduler添加任务;
          */
         try {
-            JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroupName).storeDurably(durability).build();
+            JobDetail jobDetail = JobBuilder.newJob(jobClass).
+                    withDescription(job.getDescription()).
+                    withIdentity(jobName, jobGroupName).
+                    storeDurably(durability).build();
 
             Trigger trigger = TriggerBuilder.newTrigger()
+                    .withDescription(job.getDescription())
                     .withIdentity(jobName + ScheduleConstants.TRIGGER, jobGroupName + ScheduleConstants.TRIGGER_GROUP)
                     .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
                     .startAt(new Date(new Date().getTime() + delay * 1000))
@@ -203,7 +222,7 @@ public class ScheduleManager {
      * @param time             type为1时-填cron表达式，为2-整数
      * @return
      */
-    public Boolean modify(String type, String jobName, String jobGroupName, String triggerName, String triggerGroupName, String time) {
+    public Boolean modify(String type, String jobName, String jobGroupName, String triggerName, String triggerGroupName, String time,SysQuartzJob job) {
 
         try {
             Integer status = getJobStatus(triggerName, triggerGroupName);
@@ -222,6 +241,7 @@ public class ScheduleManager {
                 // 1.CronSchedule
                 Trigger trigger = TriggerBuilder
                         .newTrigger()
+                        .withDescription(job.getDescription())
                         .withIdentity(triggerName, triggerGroupName)
                         .withSchedule(CronScheduleBuilder.cronSchedule(time))
                         .build();
@@ -237,6 +257,7 @@ public class ScheduleManager {
                 // 2.SimpleSchedule
                 Trigger trigger = TriggerBuilder
                         .newTrigger()
+                        .withDescription(job.getDescription())
                         .withIdentity(triggerName, triggerGroupName)
                         .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(Integer.valueOf(time)))
                         .build();
@@ -309,7 +330,7 @@ public class ScheduleManager {
     }
 
     public boolean checkJobExist(SysQuartzJob job) throws SchedulerException {
-        TriggerKey triggerKey = TriggerKey.triggerKey(ScheduleConstants.TASK_CLASS_NAME + job.getId() + ScheduleConstants.TRIGGER, job.getJobGroup() + ScheduleConstants.TRIGGER_GROUP);
+        TriggerKey triggerKey = TriggerKey.triggerKey(createTaskName(job.getJobName()) + ScheduleConstants.TRIGGER, job.getJobGroup() + ScheduleConstants.TRIGGER_GROUP);
         return scheduler.checkExists(triggerKey);
     }
 
@@ -327,6 +348,10 @@ public class ScheduleManager {
      * 获取jobKey
      */
     public JobKey getJobKey(SysQuartzJob job) {
-        return JobKey.jobKey(ScheduleConstants.TASK_CLASS_NAME + job.getId(), job.getJobGroup());
+        return JobKey.jobKey(createTaskName(job.getJobName()), job.getJobGroup());
+    }
+
+    public String createTaskName(String key) {
+        return ScheduleConstants.TASK_CLASS_NAME + key;
     }
 }
