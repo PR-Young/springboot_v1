@@ -24,25 +24,25 @@
             <div class="row row-sm text-center">
                 <div class="col-xs-3">
                     <div class="panel padder-v item">
-                        <div class="h1 text-info font-thin h1">[[${session.service.runTime}]]</div>
+                        <div class="h1 text-info font-thin h1">[[${service.runTime}]]</div>
                         <span class="text-muted text-xs">运行时长</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item bg-info">
-                        <div class="h1 text-fff font-thin h1">[[${session.service.startTime}]]</div>
+                        <div class="h1 text-fff font-thin h1">[[${service.startTime}]]</div>
                         <span class="text-muted text-xs">启动时间</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item bg-primary">
-                        <div class="h1 text-fff font-thin h1">[[${session.service.javaInfo.Version}]]</div>
+                        <div class="h1 text-fff font-thin h1">[[${service.javaInfo.Version}]]</div>
                         <span class="text-muted text-xs">Java版本</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item">
-                        <div class="font-thin h1">[[${session.service.javaInfo.Vendor}]]</div>
+                        <div class="font-thin h1">[[${service.javaInfo.Vendor}]]</div>
                         <span class="text-muted text-xs">供应商</span>
                     </div>
                 </div>
@@ -54,25 +54,25 @@
             <div class="row row-sm text-center">
                 <div class="col-xs-3">
                     <div class="panel padder-v item">
-                        <div class="h1 text-info font-thin h1">[[${session.service.osInfo.Name}]]</div>
+                        <div class="h1 text-info font-thin h1">[[${service.osInfo.Name}]]</div>
                         <span class="text-muted text-xs">服务器信息</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item bg-info">
-                        <div class="h1 text-fff font-thin h1">[[${session.service.osInfo.Arch}]]</div>
+                        <div class="h1 text-fff font-thin h1">[[${service.osInfo.Arch}]]</div>
                         <span class="text-muted text-xs">架构</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item bg-primary">
-                        <div class="h1 text-fff font-thin h1">[[${session.service.hostInfo.Address}]]</div>
+                        <div class="h1 text-fff font-thin h1">[[${service.hostInfo.Address}]]</div>
                         <span class="text-muted text-xs">IP地址</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item">
-                        <div class="font-thin h1">[[${session.service.hostInfo.Name}]]</div>
+                        <div class="font-thin h1">[[${service.hostInfo.Name}]]</div>
                         <span class="text-muted text-xs">服务器名称</span>
                     </div>
                 </div>
@@ -84,25 +84,25 @@
             <div class="row row-sm text-center">
                 <div class="col-xs-3">
                     <div class="panel padder-v item">
-                        <div class="h1 text-info font-thin h1">[[${session.service.javaRuntimeInfo.Name}]]</div>
+                        <div class="h1 text-info font-thin h1">[[${service.javaRuntimeInfo.Name}]]</div>
                         <span class="text-muted text-xs">Java Runtime Name</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item bg-info">
-                        <div class="h1 text-fff font-thin h1">[[${session.service.javaRuntimeInfo.HomeDir}]]</div>
+                        <div class="h1 text-fff font-thin h1">[[${service.javaRuntimeInfo.HomeDir}]]</div>
                         <span class="text-muted text-xs">Java Home Dir</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item bg-primary">
-                        <div class="h1 text-fff font-thin h1">[[${session.service.javaRuntimeInfo.ClassVersion}]]</div>
+                        <div class="h1 text-fff font-thin h1">[[${service.javaRuntimeInfo.ClassVersion}]]</div>
                         <span class="text-muted text-xs">Java Class Version</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item">
-                        <div class="font-thin h1">[[${session.service.userInfo.CurrentDir}]]</div>
+                        <div class="font-thin h1">[[${service.userInfo.CurrentDir}]]</div>
                         <span class="text-muted text-xs">项目路径</span>
                     </div>
                 </div>
@@ -114,25 +114,25 @@
             <div class="row row-sm text-center">
                 <div class="col-xs-3">
                     <div class="panel padder-v item">
-                        <div class="h1 text-info font-thin h1">[[${session.service.maxMemory}]]</div>
+                        <div class="h1 text-info font-thin h1">[[${service.maxMemory}]]</div>
                         <span class="text-muted text-xs">JVM最大内存</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item bg-info">
-                        <div class="h1 text-fff font-thin h1">[[${session.service.totalMemory}]]</div>
+                        <div class="h1 text-fff font-thin h1">[[${service.totalMemory}]]</div>
                         <span class="text-muted text-xs">JVM已分配内存</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item bg-primary">
-                        <div class="h1 text-fff font-thin h1">[[${session.service.freeMemory}]]</div>
+                        <div class="h1 text-fff font-thin h1">[[${service.freeMemory}]]</div>
                         <span class="text-muted text-xs">JVM已分配内存中的剩余空间</span>
                     </div>
                 </div>
                 <div class="col-xs-3">
                     <div class="panel padder-v item">
-                        <div class="font-thin h1">[[${session.service.usableMemory}]]</div>
+                        <div class="font-thin h1">[[${service.usableMemory}]]</div>
                         <span class="text-muted text-xs">JVM最大可用内存</span>
                     </div>
                 </div>

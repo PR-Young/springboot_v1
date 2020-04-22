@@ -14,6 +14,7 @@ public class BaseConfig {
     private String name;
     private String version;
     private String copyright;
+    private long timeout;
 
     public String getName() {
         return name;
@@ -37,5 +38,13 @@ public class BaseConfig {
 
     public void setCopyright(String copyright) {
         this.copyright = copyright;
+    }
+
+    public long getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
     }
 }

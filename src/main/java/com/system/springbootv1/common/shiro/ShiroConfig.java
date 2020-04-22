@@ -1,8 +1,9 @@
 package com.system.springbootv1.common.shiro;
 
+import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
+import com.system.springbootv1.common.config.BaseConfig;
+import com.system.springbootv1.common.redis.RedisSessionDao;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
-import org.apache.shiro.cache.CacheManager;
-import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
@@ -10,10 +11,13 @@ import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.Cookie;
+import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +27,10 @@ import java.util.Map;
  **/
 @Configuration
 public class ShiroConfig {
+
+    @Resource
+    BaseConfig baseConfig;
+
 
     @Bean
     public ShiroFilterFactoryBean shiroFilterFactory(SecurityManager securityManager) {
@@ -44,18 +52,22 @@ public class ShiroConfig {
     @Bean
     public DefaultWebSecurityManager securityManager(Realm shiroRealm) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-        securityManager.setCacheManager(cacheManager());
+        securityManager.setCacheManager(redisCacheManager());
         securityManager.setRealm(shiroRealm);
         securityManager.setSessionManager(sessionManager());
         return securityManager;
     }
 
+
     @Bean
     public DefaultWebSessionManager sessionManager() {
         DefaultWebSessionManager defaultWebSessionManager = new DefaultWebSessionManager();
-        // 设置session过期时间3600s
-        Long timeout = 60L * 1000 * 60;
-        defaultWebSessionManager.setGlobalSessionTimeout(timeout);
+        defaultWebSessionManager.setGlobalSessionTimeout(baseConfig.getTimeout());
+        defaultWebSessionManager.setSessionDAO(sessionDao());
+        defaultWebSessionManager.setCacheManager(redisCacheManager());
+        defaultWebSessionManager.setDeleteInvalidSessions(true);
+        defaultWebSessionManager.setSessionIdCookieEnabled(true);
+        defaultWebSessionManager.setSessionIdCookie(sessionIdCookie());
         return defaultWebSessionManager;
     }
 
@@ -67,10 +79,29 @@ public class ShiroConfig {
         return hashedCredentialsMatcher;
     }
 
+    //设置cookie
     @Bean
-    public CacheManager cacheManager() {
-        MemoryConstrainedCacheManager cacheManager = new MemoryConstrainedCacheManager();//使用内存缓存
-        return cacheManager;
+    public Cookie sessionIdCookie() {
+        Cookie sessionIdCookie = new SimpleCookie("ARES_ID");
+        sessionIdCookie.setMaxAge(-1);
+        sessionIdCookie.setHttpOnly(true);
+        return sessionIdCookie;
+    }
+
+//    @Bean
+//    public CacheManager cacheManager() {
+//        MemoryConstrainedCacheManager cacheManager = new MemoryConstrainedCacheManager();//使用内存缓存
+//        return cacheManager;
+//    }
+
+    @Bean
+    public ShiroCacheManager redisCacheManager() {
+        return new ShiroCacheManager(baseConfig.getTimeout());
+    }
+
+    @Bean
+    public RedisSessionDao sessionDao() {
+        return new RedisSessionDao();
     }
 
     @Bean
@@ -97,4 +128,8 @@ public class ShiroConfig {
         return new LifecycleBeanPostProcessor();
     }
 
+    @Bean
+    public ShiroDialect shiroDialect() {
+        return new ShiroDialect();
+    }
 }

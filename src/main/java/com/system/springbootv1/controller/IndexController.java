@@ -27,15 +27,14 @@ public class IndexController {
     @RequestMapping("/index")
     public String index(HttpServletRequest request) {
         BootstrapTree bootstrapTree = sysMenuService.getBootstrapTree(ShiroUtils.getUserId());
-        request.getSession().setAttribute("bootstrapTree", bootstrapTree);
-        request.getSession().setAttribute("userName", ShiroUtils.getUser().getUserName());
+        request.setAttribute("bootstrapTree", bootstrapTree);
+        request.setAttribute("userName", ShiroUtils.getUser().getUserName());
         return "index";
     }
 
     @ApiOperation(value = "局部刷新区域", notes = "局部刷新区域")
     @RequestMapping("/main")
     public String main(HttpServletRequest request) {
-        request.getSession().setAttribute("service", new Service());
         return "main";
     }
 
@@ -102,7 +101,7 @@ public class IndexController {
     @ApiOperation(value = "服务器信息类", notes = "服务器信息类")
     @RequestMapping("/service")
     public String service(HttpServletRequest request) {
-        request.getSession().setAttribute("service", new Service());
+        request.setAttribute("service", new Service());
         return "/sys/service";
     }
 

@@ -1,5 +1,6 @@
 package com.system.springbootv1.common.shiro;
 
+import com.alibaba.fastjson.JSON;
 import com.system.springbootv1.dao.ISysRoleDao;
 import com.system.springbootv1.dao.ISysUserDao;
 import com.system.springbootv1.model.SysRole;
@@ -33,7 +34,13 @@ public class MyShiroRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-        SysUser user = (SysUser) principalCollection.getPrimaryPrincipal();
+        Object object = principalCollection.getPrimaryPrincipal();
+        SysUser user = new SysUser();
+        if (object instanceof SysUser) {
+            user = (SysUser) object;
+        } else {
+            user = JSON.parseObject(JSON.toJSON(object).toString(), SysUser.class);
+        }
         List<SysRole> roleList = sysRoleDao.getRoleByUserId(user.getId());
         for (SysRole role : roleList) {
             authorizationInfo.addRole(role.getRoleName());

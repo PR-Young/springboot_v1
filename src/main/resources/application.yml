@@ -91,6 +91,7 @@ ares:
     name: ares
     version: 1.0.0
     copyright: 2020-${ares.base.name}-${ares.base.version}
+    timeout: 3600
   codegenerator:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/springbootv1?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false

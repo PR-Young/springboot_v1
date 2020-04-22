@@ -49,7 +49,6 @@ public class SysUserService implements BaseService<SysUser> {
 
     @Override
     public void update(SysUser obj) {
-        obj.setPassword(MD5Util.encode(obj.getPassword()));
         obj.setModifyTime(new Date());
         sysUserDao.update(obj);
     }

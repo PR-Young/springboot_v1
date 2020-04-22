@@ -65,7 +65,7 @@
                 <ul class="nav navbar-top-links navbar-right">
                     <li class="dropdown">
                         <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-                            <i class="fa fa-user"> [[${session.userName}]]</i>
+                            <i class="fa fa-user"> [[${userName}]]</i>
                         </a>
                         <ul class="dropdown-menu">
                             <li class="m-t-xs">
@@ -104,7 +104,7 @@
 <script type="text/javascript" th:inline="javascript">
     window.rootPath = [[${rootPath}]];
     $(document).ready(function () {
-        var menus = [[${session.bootstrapTree.nodes}]];
+        var menus = [[${bootstrapTree.nodes}]];
         var menuText = "";
         for (var i = 0; i < menus.length; i++) {
             var caidan = menus[i].nodes;
