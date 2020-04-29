@@ -32,8 +32,8 @@ spring:
         enabled: true
         reset-enable: false
         url-pattern: /druid/*
-        login-username: admin
-        login-password: admin
+#        login-username: admin
+#        login-password: admin
       filter:
         slf4j:
           enable: true

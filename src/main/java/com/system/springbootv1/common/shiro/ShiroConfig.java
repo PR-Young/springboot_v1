@@ -43,6 +43,7 @@ public class ShiroConfig {
         filterMap.put("/login/login", "anon");
         filterMap.put("/logout", "logout");
         filterMap.put("/druid/**", "anon");
+        filterMap.put("/actuator/**", "anon");
         filterMap.put("/**", "authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterMap);
         shiroFilterFactoryBean.setSecurityManager(securityManager);
@@ -62,7 +63,7 @@ public class ShiroConfig {
     @Bean
     public DefaultWebSessionManager sessionManager() {
         DefaultWebSessionManager defaultWebSessionManager = new DefaultWebSessionManager();
-        defaultWebSessionManager.setGlobalSessionTimeout(baseConfig.getTimeout());
+        defaultWebSessionManager.setGlobalSessionTimeout(baseConfig.getTimeout() * 1000);
         defaultWebSessionManager.setSessionDAO(sessionDao());
         defaultWebSessionManager.setCacheManager(redisCacheManager());
         defaultWebSessionManager.setDeleteInvalidSessions(true);
@@ -82,7 +83,7 @@ public class ShiroConfig {
     //设置cookie
     @Bean
     public Cookie sessionIdCookie() {
-        Cookie sessionIdCookie = new SimpleCookie("ARES_ID");
+        Cookie sessionIdCookie = new SimpleCookie("ARES_COOKIE");
         sessionIdCookie.setMaxAge(-1);
         sessionIdCookie.setHttpOnly(true);
         return sessionIdCookie;

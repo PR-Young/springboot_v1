@@ -1,3 +1,4 @@
+${AnsiColor.BRIGHT_BLACK}
  ┏━┓       ┏━┓
  ┏━┛┻━━━━━━━━┛┻━┓
  ┃              ┃ 　
@@ -15,3 +16,8 @@
  ┗━┓━┓┏━━━┳━┓ ┏━┛
  ┃ ┫ ┫  ┃ ┫ ┫
  ┗━┻━┛　┗━┻━┛
+${AnsiColor.BLUE}
+:::  ARES  :::
+::: version: V1.0.0 :::
+::: spring-boot: ${spring-boot.formatted-version} :::
+

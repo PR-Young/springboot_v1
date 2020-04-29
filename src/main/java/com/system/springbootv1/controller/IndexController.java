@@ -29,6 +29,7 @@ public class IndexController {
         BootstrapTree bootstrapTree = sysMenuService.getBootstrapTree(ShiroUtils.getUserId());
         request.setAttribute("bootstrapTree", bootstrapTree);
         request.setAttribute("userName", ShiroUtils.getUser().getUserName());
+        request.setAttribute("sysUser", ShiroUtils.getUser());
         return "index";
     }
 

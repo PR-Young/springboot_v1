@@ -86,6 +86,29 @@ logging:
 path:
   log: logs
 
+# Spring Boot Actuator:健康检查、审计、统计和监控 配置
+management:
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      show-details: always
+  # Use "*" to expose all endpoints, or a comma-separated [health,info] list to expose selected ones
+  endpoints:
+    web:
+      exposure:
+        include: ["*"]
+        exclude:
+
+info:
+  app:
+    name: @project.name@
+    description: @project.description@
+    version: @project.version@
+    encoding: @project.build.sourceEncoding@
+    java:
+      vaersion: @java.version@
+
 ares:
   base:
     name: ares
@@ -106,6 +129,4 @@ ares:
     xmlDir: .src.main.resources.mapping
     servicePackage: com.system.springbootv1.service
     controllerPackage: com.system.springbootv1.controller
-
-
 
