@@ -8,7 +8,13 @@ public enum DataType {
 
     VARCHAR("varchar", "VARCHAR"),
     TIMESTAMP("datetime", "TIMESTAMP"),
-    INTEGER("int", "INTEGER");
+    INTEGER("int", "INTEGER"),
+    BIGINT("bigint","BIGINT"),
+    FLOAT("float","FLOAT"),
+    DOUBLE("double","DOUBLE"),
+    NUMERIC("numeric","NUMERIC"),
+    DECIMAL("decimal","DECIMAL"),
+    LONGVARCHAR("longvarchar","LONGVARCHAR");
 
     private String type;
 

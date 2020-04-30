@@ -8,7 +8,11 @@ public enum ColumnType {
     STRING("varchar", "String"),
     DATETIME("datetime", "Date"),
     TIMESTAMP("timestamp", "Date"),
-    INTEGER("int", "Integer");
+    INTEGER("int", "Integer"),
+    BIGINT("bigint","Integer"),
+    NUMERIC("numeric","Long"),
+    DECIMAL("decimal","Long"),
+    LONGVARCHAR("longvarchar","String");
 
     private String jdbcType;
 

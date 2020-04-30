@@ -248,6 +248,7 @@ public class ScheduleManager {
                 //删除旧的任务，否则报错
                 //scheduler.deleteJob(key);
                 delete(jobName, jobGroupName);
+                jobDetail.getJobDataMap().put(ScheduleConstants.TASK_PROPERTIES, job);
                 //重新启动任务
                 scheduler.scheduleJob(jobDetail, trigger);
                 return true;
@@ -264,6 +265,7 @@ public class ScheduleManager {
                 //删除旧的任务，否则报错
                 //scheduler.deleteJob(key);
                 delete(jobName, jobGroupName);
+                jobDetail.getJobDataMap().put(ScheduleConstants.TASK_PROPERTIES, job);
                 //重新启动任务
                 scheduler.scheduleJob(jobDetail, trigger);
                 return true;

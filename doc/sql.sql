@@ -361,7 +361,7 @@ CREATE TABLE `sys_quartz_job` (
 -- ----------------------------
 -- Records of sys_quartz_job
 -- ----------------------------
-INSERT INTO `sys_quartz_job` VALUES ('382382538846507008', 'test', 'DEFAULT', '测试', 'com.system.springbootv1.common.quartz.jobs.TestJob.test()', '0 */1 * * * ?', '1', '0', '2020-01-29 06:18:32', '2020-04-15 07:10:57');
+INSERT INTO `sys_quartz_job` VALUES ('382382538846507008', 'test', 'DEFAULT', '测试', 'com.system.springbootv1.jobs.TestJob.test()', '0 */1 * * * ?', '1', '0', '2020-01-29 06:18:32', '2020-04-15 07:10:57');
 
 -- ----------------------------
 -- Table structure for sys_quartz_job_log
