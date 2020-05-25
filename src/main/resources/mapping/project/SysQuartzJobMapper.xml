@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.system.springbootv1.project.dao.ISysQuartzJobDao">
+  <resultMap id="SysQuartzJob" type="com.system.springbootv1.project.model.SysQuartzJob">
+    <id column="Id" jdbcType="VARCHAR" property="id" />
+    <result column="JobName" jdbcType="VARCHAR" property="jobName" />
+    <result column="JobGroup" jdbcType="VARCHAR" property="jobGroup" />
+    <result column="Description" jdbcType="VARCHAR" property="description" />
+    <result column="InvokeTarget" jdbcType="VARCHAR" property="invokeTarget" />
+    <result column="CronExpression" jdbcType="VARCHAR" property="cronExpression" />
+    <result column="ConCurrent" jdbcType="VARCHAR" property="conCurrent" />
+    <result column="Status" jdbcType="INTEGER" property="status" />
+    <result column="Creator" jdbcType="VARCHAR" property="creator"/>
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
+    <result column="Modifier" jdbcType="VARCHAR" property="modifier"/>
+    <result column="ModifyTime" jdbcType="TIMESTAMP" property="modifyTime"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    Id, JobName, JobGroup, Description, InvokeTarget, CronExpression, ConCurrent, Status,Creator,
+    CreateTime,Modifier, ModifyTime
+  </sql>
+  <select id="list" parameterType="java.util.Map" resultMap="SysQuartzJob">
+    select
+    <include refid="Base_Column_List"/>
+    from `sys_quartz_job`
+    where 1=1
+    <if test="search != null">
+      and (`JobName` like '%${search}%' or `JobGroup` like '%${search}%')
+    </if>
+    <if test="sort != null">
+      order by ${sort}
+    </if>
+    <if test="sort == null">
+      order by `CreateTime` desc
+    </if>
+  </select>
+  <select id="getById" parameterType="java.lang.String" resultMap="SysQuartzJob">
+    select
+    <include refid="Base_Column_List"/>
+    from `sys_quartz_job`
+    where `Id` = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByIds" parameterType="java.util.List">
+    delete from `sys_quartz_job`
+    where `Id` in
+    <foreach collection="list" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+  <insert id="insert" parameterType="com.system.springbootv1.project.model.SysQuartzJob">
+    insert into sys_quartz_job (Id, JobName, JobGroup, Description,
+      InvokeTarget, CronExpression,
+      ConCurrent, Status,Creator, CreateTime, Modifier,
+      ModifyTime)
+    values (#{id,jdbcType=VARCHAR}, #{jobName,jdbcType=VARCHAR}, #{jobGroup,jdbcType=VARCHAR},
+      #{description,jdbcType=VARCHAR},#{invokeTarget,jdbcType=VARCHAR}, #{cronExpression,jdbcType=VARCHAR},
+      #{conCurrent,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},#{creator,jdbcType=VARCHAR},
+       #{createTime,jdbcType=TIMESTAMP},#{modifier,jdbcType=VARCHAR},#{modifyTime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="update" parameterType="com.system.springbootv1.project.model.SysQuartzJob">
+    update sys_quartz_job
+    <set>
+      <if test="jobName != null">
+        JobName = #{jobName,jdbcType=VARCHAR},
+      </if>
+      <if test="jobGroup != null">
+        JobGroup = #{jobGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        Description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="invokeTarget != null">
+        InvokeTarget = #{invokeTarget,jdbcType=VARCHAR},
+      </if>
+      <if test="cronExpression != null">
+        CronExpression = #{cronExpression,jdbcType=VARCHAR},
+      </if>
+      <if test="conCurrent != null">
+        ConCurrent = #{conCurrent,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        Status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="creator != null">
+        Creator = #{creator,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifier != null">
+        Modifier = #{modifier,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null">
+        ModifyTime = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where Id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <select id="checkUnique" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(1)
+        from `sys_quartz_job`
+        where `JobName` = #{jobName,jdbcType=VARCHAR}
+    </select>
+
+  <select id="selectList" parameterType="com.system.springbootv1.project.model.SysQuartzJob" resultMap="SysQuartzJob">
+    select
+    <include refid="Base_Column_List"/>
+    from `sys_quartz_job`
+    where 1=1
+    <if test="jobName != null and jobName != ''">
+      and `JobName` like concat('%', #{jobName}, '%')
+    </if>
+    <if test="jobGroup != null and jobGroup != ''">
+      and `JobGroup` =  #{jobGroup}
+    </if>
+    <if test="status != null">
+      and `Status` = #{status}
+    </if>
+    <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+      AND date_format(`CreateTime`,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+    </if>
+    <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+      AND date_format(`Create_time`,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+    </if>
+  </select>
+
+</mapper>

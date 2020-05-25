@@ -50,4 +50,9 @@ public class ${entityName}Service implements BaseService<${entityName}>{
         return ${entityName1}Dao.getById(id);
     }
 
+    public List<${entityName}> list(${entityName} obj) {
+        List<${entityName}> lists = ${entityName1}Dao.selectList(obj);
+        return lists;
+    }
+
 }

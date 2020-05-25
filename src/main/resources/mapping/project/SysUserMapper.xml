@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.system.springbootv1.project.dao.ISysUserDao">
+    <resultMap id="SysUser" type="com.system.springbootv1.project.model.SysUser">
+        <id column="Id" jdbcType="VARCHAR" property="id"/>
+        <result column="Account" jdbcType="VARCHAR" property="account"/>
+        <result column="UserName" jdbcType="VARCHAR" property="userName"/>
+        <result column="Password" jdbcType="VARCHAR" property="password"/>
+        <result column="PhoneNumber" jdbcType="VARCHAR" property="phoneNumber"/>
+        <result column="Email" jdbcType="VARCHAR" property="email"/>
+        <result column="Avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="Creator" jdbcType="VARCHAR" property="creator"/>
+        <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="Modifier" jdbcType="VARCHAR" property="modifier"/>
+        <result column="ModifyTime" jdbcType="TIMESTAMP" property="modifyTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        `Id`, `Account`, `UserName`, `Password`,`PhoneNumber`,`Email`,`Avatar`,`Creator` ,`CreateTime`,`Modifier`, `ModifyTime`
+    </sql>
+    <insert id="insert" parameterType="com.system.springbootv1.project.model.SysUser">
+      insert into `sys_user` (`Id`, `Account`, `UserName`,`Password`,`PhoneNumber`,`Email`,`Avatar`,`Creator` ,`CreateTime`,`Modifier`, `ModifyTime`)
+      values (#{id,jdbcType=VARCHAR}, #{account,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR},
+        #{password,jdbcType=VARCHAR},#{phoneNumber,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR},
+        #{avatar,jdbcType=VARCHAR},#{creator,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP},
+        #{modifier,jdbcType=VARCHAR},#{modifyTime,jdbcType=TIMESTAMP})
+    </insert>
+    <update id="update" parameterType="com.system.springbootv1.project.model.SysUser">
+        update `sys_user`
+        <set>
+            <if test="account != null">
+                `Account` = #{account,jdbcType=VARCHAR},
+            </if>
+            <if test="userName != null">
+                `UserName` = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                `Password` = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="phoneNumber != null">
+                `PhoneNumber` = #{phoneNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                `Email` = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="avatar != null">
+                `Avatar` = #{avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="creator != null">
+                `Creator` = #{creator,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                `CreateTime` = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifier != null">
+                `Modifier` = #{modifier,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null">
+                `ModifyTime` = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where `Id` = #{id,jdbcType=VARCHAR}
+    </update>
+    <delete id="deleteByIds" parameterType="java.util.List">
+        delete from `sys_user`
+        where `Id` in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+
+    </delete>
+    <select id="getUserByName" parameterType="java.lang.String" resultMap="SysUser">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_user`
+        where `Account` = #{userName,jdbcType=VARCHAR}
+    </select>
+    <select id="getById" parameterType="java.lang.String" resultMap="SysUser">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_user`
+        where `Id` = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <select id="list" parameterType="java.util.Map" resultMap="SysUser">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_user`
+        where 1=1
+        <if test="search != null">
+            and (`Account` like '%${search}%' or `UserName` like '%${search}%')
+        </if>
+        <if test="sort != null">
+            order by ${sort}
+        </if>
+        <if test="sort == null">
+            order by `CreateTime` desc
+        </if>
+    </select>
+
+    <select id="checkAccount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(1)
+        from `sys_user`
+        where `Account` = #{userName,jdbcType=VARCHAR}
+    </select>
+
+    <update id="resetPassword">
+        update `sys_user` set `Password` = #{password}
+        where `Id` = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="getUserByRole" parameterType="java.lang.String" resultMap="SysUser">
+        select
+         user.`Id`, user.`Account`, user.`UserName`, user.`Password`,user.`PhoneNumber`,user.`Email`,user.`Avatar`, user.`CreateTime`, user.`ModifyTime`
+        from `sys_user` user
+        left join `sys_role_user` roleuser on user.Id = roleuser.UserId
+        where roleuser.RoleId = #{roleId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="allUser" parameterType="java.lang.String" resultMap="SysUser">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_user`
+        where `Id` not in (
+        select `UserId`
+        from `sys_role_user`
+        where `RoleId` = #{roleId,jdbcType=VARCHAR}
+        )
+    </select>
+    
+    <select id="selectList" parameterType="com.system.springbootv1.project.model.SysUser" resultMap="SysUser">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_user`
+        where 1=1
+        <if test="userName != null and userName != ''">
+            and `UserName` like concat('%', #{userName}, '%')
+        </if>
+        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(`CreateTime`,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(`Create_time`,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+    </select>
+</mapper>

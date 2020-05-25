@@ -1,7 +1,7 @@
 package com.system.springbootv1.common.quartz;
 
 import com.system.springbootv1.common.spring.SpringUtils;
-import com.system.springbootv1.model.SysQuartzJob;
+import com.system.springbootv1.project.model.SysQuartzJob;
 import com.system.springbootv1.utils.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;

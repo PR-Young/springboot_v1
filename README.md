@@ -1,10 +1,13 @@
 # springboot_v1
-用于springboot各种技术的学习。
+
 
 # 结构
 
 ```
 Springboot
+│
+├─ares-ui vue前端 参考若依vue前端http://www.ruoyi.vip
+│
 ├─doc  项目SQL语句以及文档
 │
 ├─common 公共模块
@@ -16,20 +19,22 @@ Springboot
 │  ├─model 通用实体
 │  ├─quartz spring计划任务
 │  ├─rabbitmq rabbitmq配置
-│  ├─redis 缓存篇日志
+│  ├─redis 缓存配置
 │  ├─shiro shiro权限模块
 │  ├─spring Spring工具
 │  └─templates 模版
 │
-├─controller 请求访问模块
-│
-├─dao Dao模块
-│
-├─model 实体类模块
-│
-├─service 服务层模块
+├─project 系统模块
+│  ├─controller 请求访问模块
+│  ├─dao Dao模块
+│  ├─model 实体类模块
+│  └─service 服务层模块
 │
 ├─utils 工具模块
+│
+├─restful 前后分离请求访问模块
+│
+├─jobs 定时任务
 │
 ├─ServletInitializer 启动类
 │ 
@@ -39,7 +44,8 @@ Springboot
 │
 ├─resources 配置文件夹
 │  ├─mapping mybatis Mapper.xml文件夹
-│  │
+│  │   ├─project 
+│  │   └─generator 代码生成
 │  ├─static 静态文件存放文件夹
 │  │   ├─css css目录存放
 │  │   ├─js js存放

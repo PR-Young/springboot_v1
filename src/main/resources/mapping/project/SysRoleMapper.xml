@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.system.springbootv1.project.dao.ISysRoleDao">
+    <resultMap id="SysRole" type="com.system.springbootv1.project.model.SysRole">
+        <id column="Id" jdbcType="VARCHAR" property="id"/>
+        <result column="RoleName" jdbcType="VARCHAR" property="roleName"/>
+        <result column="Description" jdbcType="VARCHAR" property="description"/>
+        <result column="Creator" jdbcType="VARCHAR" property="creator"/>
+        <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="Modifier" jdbcType="VARCHAR" property="modifier"/>
+        <result column="ModifyTime" jdbcType="TIMESTAMP" property="modifyTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        `Id`, `RoleName`, `Description`,`Creator`, `CreateTime`, `Modifier,``ModifyTime`
+    </sql>
+    <insert id="insert" parameterType="com.system.springbootv1.project.model.SysRole">
+      insert into `sys_role` (`Id`, `RoleName`, `Description`, `Creator`, `CreateTime`, `Modifier,``ModifyTime`)
+      values (#{id,jdbcType=VARCHAR}, #{roleName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR},
+         #{creator,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP},
+         #{modifier,jdbcType=VARCHAR},#{modifyTime,jdbcType=TIMESTAMP})
+    </insert>
+    <update id="update" parameterType="com.system.springbootv1.project.model.SysRole">
+        update `sys_role`
+        <set>
+            <if test="roleName != null">
+                `RoleName` = #{roleName,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                `Description` = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="creator != null">
+                `Creator` = #{creator,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                `CreateTime` = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifier != null">
+                `Modifier` = #{modifier,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null">
+                `ModifyTime` = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where `Id` = #{id,jdbcType=VARCHAR}
+    </update>
+    <delete id="deleteByIds" parameterType="java.util.List">
+        delete from `sys_role`
+        where `Id` in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="getRoleByUserId" parameterType="java.lang.String" resultMap="SysRole">
+        select
+        role.`Id`, role.`RoleName`, role.`Description`, role.`CreateTime`, role.`ModifyTime`
+        from `sys_role` role
+        left join `sys_role_user` roleuser on role.Id = roleuser.RoleId
+        where roleuser.UserId = #{userId,jdbcType=VARCHAR}
+    </select>
+    <select id="getPermsByRoleId" parameterType="java.lang.String" resultType="java.lang.String">
+        select menu.Perms
+        from sys_menu menu
+        <if test="roleId != null">
+            left join sys_permission permission on menu.Id = permission.MenuId
+            where permission.RoleId = #{roleId,jdbcType=VARCHAR}
+        </if>
+    </select>
+    <select id="getById" parameterType="java.lang.String" resultMap="SysRole">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_role`
+        where `Id` = #{id,jdbcType=VARCHAR}
+    </select>
+    <select id="list" parameterType="java.util.Map" resultMap="SysRole">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_role`
+        where 1=1
+        <if test="search != null">
+            and (`RoleName` like '%${search}%' or `Description` like '%${search}%')
+        </if>
+        <if test="sort != null">
+            order by ${sort}
+        </if>
+        <if test="sort == null">
+            order by `CreateTime` desc
+        </if>
+    </select>
+
+    <insert id="insertRoleUser" parameterType="java.util.Map">
+        insert into sys_role_user(Id,UserId,RoleId)values(#{id},#{userId},#{roleId})
+    </insert>
+    <insert id="insertPermission" parameterType="java.util.Map">
+        insert into sys_permission(Id,MenuId,RoleId)values(#{id},#{menuId},#{roleId})
+    </insert>
+    <delete id="deleteRoleUser" parameterType="java.lang.String">
+        delete from sys_role_user where RoleId = #{roleId,jdbcType=VARCHAR}
+    </delete>
+    <delete id="deletePermission" parameterType="java.lang.String">
+        delete from sys_permission where RoleId = #{roleId,jdbcType=VARCHAR}
+    </delete>
+    <delete id="deleteRoleByUser" parameterType="java.lang.String">
+        delete from sys_role_user where UserId = #{userId,jdbcType=VARCHAR}
+    </delete>
+
+    <select id="selectList" parameterType="com.system.springbootv1.project.model.SysRole" resultMap="SysRole">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_role`
+        where 1=1
+        <if test="roleName != null and roleName != ''">
+            and `RoleName` like concat('%', #{roleName}, '%')
+        </if>
+        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(`CreateTime`,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(`Create_time`,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+    </select>
+
+    <select id="checkRoleName" parameterType="java.lang.String" resultType="int">
+        select count(1) from `sys_role` where `RoleName` = #{roleName}
+    </select>
+</mapper>

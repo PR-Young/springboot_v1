@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.system.springbootv1.project.dao.IGeneratorDao">
+    <select id="getTables" parameterType="java.util.Map" resultType="java.util.HashMap">
+        SELECT
+            `TABLE_NAME`,
+            `TABLE_COMMENT`,
+            `CREATE_TIME`,
+            `UPDATE_TIME`
+        FROM
+            information_schema.`TABLES`
+        WHERE
+            `TABLE_SCHEMA` = (SELECT DATABASE())
+        AND `TABLE_NAME` NOT LIKE 'qrtz_%'
+        <if test="tableName != null and tableName != ''">
+            AND lower(`TABLE_NAME`) like lower(concat('%', #{tableName}, '%'))
+        </if>
+        <if test="tableComment != null and tableComment != ''">
+            AND lower(`TABLE_COMMENT`) like lower(concat('%', #{tableComment}, '%'))
+        </if>
+        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(`CREATE_TIME`,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(`CREATE_TIME`,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+        ORDER BY `CREATE_TIME` DESC
+    </select>
+
+    <select id="getColumnsByTable" resultType="java.util.HashMap">
+        SELECT
+            `COLUMN_NAME`,`COLUMN_COMMENT`,`COLUMN_TYPE`,`TABLE_CATALOG`,`TABLE_SCHEMA`
+        FROM
+            information_schema.`COLUMNS`
+        where TABLE_NAME = #{tableName}
+        <if test="search != null">
+            and (`COLUMN_NAME` like '%${search}%' or `COLUMN_COMMENT` like '%${search}%')
+        </if>
+        <if test="sort != null">
+            order by ${sort}
+        </if>
+        <if test="sort == null">
+            order by `COLUMN_NAME` asc
+        </if>
+    </select>
+
+    <select id="selectTableColumnListByTableName"  resultType="java.util.HashMap">
+        select `COLUMN_NAME`,`COLUMN_COMMENT`,`COLUMN_TYPE`,`TABLE_CATALOG`,`TABLE_SCHEMA`
+        from information_schema.`COLUMNS`
+        where `TABLE_NAME` = #{tableName}
+    </select>
+</mapper>

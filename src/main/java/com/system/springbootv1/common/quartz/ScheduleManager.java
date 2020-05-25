@@ -1,7 +1,7 @@
 package com.system.springbootv1.common.quartz;
 
-import com.system.springbootv1.model.SysQuartzJob;
-import com.system.springbootv1.service.SysQuartzJobService;
+import com.system.springbootv1.project.model.SysQuartzJob;
+import com.system.springbootv1.project.service.SysQuartzJobService;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class ScheduleManager {
                 getQuartzJobClass(job),
                 false,
                 job.getCronExpression(),
-                10,
+                60,
                 job);
 
     }

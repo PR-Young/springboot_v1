@@ -1,7 +1,10 @@
 package com.system.springbootv1.common.shiro;
 
-import com.system.springbootv1.model.SysUser;
+import com.system.springbootv1.common.exception.UserException;
+import com.system.springbootv1.project.model.SysUser;
 import com.system.springbootv1.utils.BeanUtils;
+import com.system.springbootv1.common.redis.RedisUtil;
+import com.system.springbootv1.utils.ServletUtils;
 import com.system.springbootv1.utils.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -15,43 +18,48 @@ import org.apache.shiro.subject.Subject;
  * @author: yy 2020/01/22
  **/
 public class ShiroUtils {
-    private ShiroUtils(){}
+    private ShiroUtils() {
+    }
 
     /**
      * 获取shiro subject
      */
-    public static Subject getSubjct()
-    {
+    public static Subject getSubjct() {
         return SecurityUtils.getSubject();
     }
 
     /**
      * 获取登录session
      */
-    public static Session getSession()
-    {
+    public static Session getSession() {
         return SecurityUtils.getSubject().getSession();
     }
 
     /**
      * 退出登录
      */
-    public static void logout()
-    {
+    public static void logout() {
         getSubjct().logout();
     }
 
     /**
      * 获取登录用户model
      */
-    public static SysUser getUser()
-    {
+    public static SysUser getUser() throws Exception {
         SysUser user = null;
         Object obj = getSubjct().getPrincipal();
-        if (StringUtils.isNotNull(obj))
-        {
+        if (StringUtils.isNotNull(obj) && !(obj instanceof String)) {
             user = new SysUser();
             BeanUtils.copyBeanProp(user, obj);
+        } else {
+            String token = ServletUtils.getToken();
+            Object object = RedisUtil.get(token);
+            if (null != object) {
+                user = new SysUser();
+                BeanUtils.copyBeanProp(user, object);
+            }else {
+                throw new UserException();
+            }
         }
         return user;
     }
@@ -59,8 +67,7 @@ public class ShiroUtils {
     /**
      * set用户
      */
-    public static void setUser(SysUser user)
-    {
+    public static void setUser(SysUser user) {
         Subject subject = getSubjct();
         PrincipalCollection principalCollection = subject.getPrincipals();
         String realmName = principalCollection.getRealmNames().iterator().next();
@@ -72,8 +79,7 @@ public class ShiroUtils {
     /**
      * 清除授权信息
      */
-    public static void clearCachedAuthorizationInfo()
-    {
+    public static void clearCachedAuthorizationInfo() {
         RealmSecurityManager rsm = (RealmSecurityManager) SecurityUtils.getSecurityManager();
         MyShiroRealm realm = (MyShiroRealm) rsm.getRealms().iterator().next();
         realm.clearCachedAuthorizationInfo();
@@ -82,10 +88,9 @@ public class ShiroUtils {
     /**
      * 获取登录用户id
      */
-    public static String getUserId()
-    {
+    public static String getUserId() throws Exception {
         SysUser user = getUser();
-        if (user == null || user.getId() == null){
+        if (user == null || user.getId() == null) {
             throw new RuntimeException("用户不存在！");
         }
         return user.getId().trim();
@@ -94,10 +99,9 @@ public class ShiroUtils {
     /**
      * 获取登录用户name
      */
-    public static String getLoginName()
-    {
+    public static String getLoginName() throws Exception {
         SysUser user = getUser();
-        if (user == null){
+        if (user == null) {
             throw new RuntimeException("用户不存在！");
         }
         return user.getUserName();
@@ -106,16 +110,14 @@ public class ShiroUtils {
     /**
      * 获取登录用户ip
      */
-    public static String getIp()
-    {
+    public static String getIp() {
         return getSubjct().getSession().getHost();
     }
 
     /**
      * 获取登录用户sessionid
      */
-    public static String getSessionId()
-    {
+    public static String getSessionId() {
         return String.valueOf(getSubjct().getSession().getId());
     }
 }

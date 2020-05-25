@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.system.springbootv1.project.dao.ISysQuartzJobLogDao">
+  <resultMap id="SysQuartzJobLog" type="com.system.springbootv1.project.model.SysQuartzJobLog">
+    <id column="Id" jdbcType="VARCHAR" property="id" />
+    <result column="JobName" jdbcType="VARCHAR" property="jobName" />
+    <result column="JobGroup" jdbcType="VARCHAR" property="jobGroup" />
+    <result column="InvokeTarget" jdbcType="VARCHAR" property="invokeTarget" />
+    <result column="JobMessage" jdbcType="VARCHAR" property="jobMessage" />
+    <result column="Status" jdbcType="INTEGER" property="status" />
+    <result column="ExceptionInfo" jdbcType="VARCHAR" property="exceptionInfo" />
+    <result column="StartTime" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="FinishTime" jdbcType="TIMESTAMP" property="finishTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    Id, JobName, JobGroup, InvokeTarget, JobMessage, Status, ExceptionInfo, StartTime,
+    FinishTime
+  </sql>
+    <select id="list" parameterType="java.util.Map" resultMap="SysQuartzJobLog">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_quartz_job_log`
+        where 1=1
+        <if test="search != null">
+            and (`JobName` like '%${search}%' or `JobGroup` like '%${search}%')
+        </if>
+        <if test="sort != null">
+            order by ${sort}
+        </if>
+        <if test="sort == null">
+            order by `Id` desc
+        </if>
+    </select>
+    <delete id="deleteByIds" parameterType="java.util.List">
+        delete from `sys_quartz_job_log`
+        where `Id` in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+  <insert id="insert" parameterType="com.system.springbootv1.project.model.SysQuartzJobLog">
+    insert into sys_quartz_job_log (Id, JobName, JobGroup, 
+      InvokeTarget, JobMessage, Status, 
+      ExceptionInfo, StartTime, FinishTime
+      )
+    values (#{id,jdbcType=VARCHAR}, #{jobName,jdbcType=VARCHAR}, #{jobGroup,jdbcType=VARCHAR},
+      #{invokeTarget,jdbcType=VARCHAR}, #{jobMessage,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
+      #{exceptionInfo,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, #{finishTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <update id="update" parameterType="com.system.springbootv1.project.model.SysQuartzJobLog">
+    update sys_quartz_job_log
+    <set>
+      <if test="jobName != null">
+        JobName = #{jobName,jdbcType=VARCHAR},
+      </if>
+      <if test="jobGroup != null">
+        JobGroup = #{jobGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="invokeTarget != null">
+        InvokeTarget = #{invokeTarget,jdbcType=VARCHAR},
+      </if>
+      <if test="jobMessage != null">
+        JobMessage = #{jobMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        Status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="exceptionInfo != null">
+        ExceptionInfo = #{exceptionInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+          StartTime = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null">
+          FinishTime = #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where Id = #{id,jdbcType=VARCHAR}
+  </update>
+
+    <select id="selectList" parameterType="com.system.springbootv1.project.model.SysQuartzJobLog" resultMap="SysQuartzJobLog">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_quartz_job_log`
+        where 1=1
+        <if test="jobName != null and jobName != ''">
+            and `JobName` like concat('%', #{jobName}, '%')
+        </if>
+        <if test="jobGroup != null and jobGroup != ''">
+            and `JobGroup` like concat('%', #{jobGroup}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            and `Status` like concat('%', #{status}, '%')
+        </if>
+        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(`StartTime`,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(`StartTime`,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+    </select>
+
+    <update id="cleanJobLog">
+        truncate table `sys_quartz_job_log`
+    </update>
+
+    <select id="getById" parameterType="java.lang.String" resultMap="SysQuartzJobLog">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_quartz_job_log`
+        where `Id` = #{id,jdbcType=VARCHAR}
+    </select>
+</mapper>

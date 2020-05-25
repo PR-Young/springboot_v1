@@ -59,5 +59,16 @@
         </if>
     </select>
 
-
+    <select id="selectList" parameterType="${entityPackage}.${entityName}" resultMap="${entityName}">
+        select
+        <include refid="Base_Column_List"/>
+        from `${tableName}`
+        where 1=1
+        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(`CreateTime`,'%y%m%d') &gt;= date_format(${r"#{beginTime}"},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(`Create_time`,'%y%m%d') &lt;= date_format(${r"#{endTime}"},'%y%m%d')
+        </if>
+    </select>
 </mapper>

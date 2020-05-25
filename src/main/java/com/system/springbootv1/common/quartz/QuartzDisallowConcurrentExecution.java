@@ -1,6 +1,6 @@
 package com.system.springbootv1.common.quartz;
 
-import com.system.springbootv1.model.SysQuartzJob;
+import com.system.springbootv1.project.model.SysQuartzJob;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 

@@ -1,11 +1,15 @@
 server:
   port: 8080
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 800
+    min-spare-threads: 30
 spring:
   profiles:
     active: dev
   devtools:
     restart:
-      enabled: true
+      enabled: false
   mvc:
     static-path-pattern: /static/**
   thymeleaf:
@@ -39,9 +43,7 @@ spring:
             threadPriority: 5
             threadsInheritContextClassLoaderOfInitializingThread: true
     job-store-type: jdbc
-#    jdbc:
-#      initialize-schema: embedded
-
+#消息配置
 #  rabbitmq:
 #    host: localhost
 #    port: 5672
@@ -70,17 +72,17 @@ spring:
 #      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 mybatis:
-  mapper-locations: classpath:mapping/*.xml
-  type-aliases-package: com.system.springbootV1.model
+  mapper-locations: classpath:mapping/**/*.xml
+  type-aliases-package: com.system.springbootV1.**.model
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
+#分页配置
 pagehelper:
   helperDialect: mysql
   reasonable: true
   supportMethodsArguments: true
   params: count=countSql
-
+#日志配置
 logging:
   config: classpath:logback-spring.xml
 path:
@@ -99,7 +101,6 @@ management:
       exposure:
         include: ["*"]
         exclude:
-
 info:
   app:
     name: @project.name@
@@ -107,14 +108,19 @@ info:
     version: @project.version@
     encoding: @project.build.sourceEncoding@
     java:
-      vaersion: @java.version@
+      version: @java.version@
 
+#基本配置信息
 ares:
   base:
-    name: ares
+    name: ARES
     version: 1.0.0
-    copyright: 2020-${ares.base.name}-${ares.base.version}
+    copyright: 2020-2020@${ares.base.name}-${ares.base.version}
+    #全局session时间
     timeout: 3600
+    #前后端分离配置
+    separate: true
+  #代码生成配置
   codegenerator:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/springbootv1?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
@@ -124,9 +130,9 @@ ares:
     tableName: test_v
     tablePrefix:
     genenaterLevel: 1
-    basePackage: com.system.springbootv1.model
-    daoPackage: com.system.springbootv1.dao
-    xmlDir: .src.main.resources.mapping
-    servicePackage: com.system.springbootv1.service
-    controllerPackage: com.system.springbootv1.controller
+    basePackage: com.system.springbootv1.project.model
+    daoPackage: com.system.springbootv1.project.dao
+    xmlDir: .src.main.resources.mapping.project
+    servicePackage: com.system.springbootv1.project.service
+    controllerPackage: com.system.springbootv1.project.controller
 

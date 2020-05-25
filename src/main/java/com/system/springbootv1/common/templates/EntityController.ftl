@@ -1,9 +1,9 @@
 package ${controllerPackage};
 
 import com.github.pagehelper.PageInfo;
-import com.system.springbootv1.model.BaseResult;
+import com.system.springbootv1.project.model.BaseResult;
 import ${entityPackage}.${entityName};
-import com.system.springbootv1.model.TableResult;
+import com.system.springbootv1.project.model.TableResult;
 import ${servicePackage}.${entityName}Service;
 import com.system.springbootv1.utils.ServletUtils;
 import com.system.springbootv1.utils.StringUtils;

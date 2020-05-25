@@ -9,11 +9,11 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -21,14 +21,26 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @description:
  * @author: yy 2020/03/31
  **/
+@Component
 public class FreeMarkerGeneratorUtil {
 
     private static Logger log = LoggerFactory.getLogger(FreeMarkerGeneratorUtil.class);
+
+    @Resource
+    CodeGenerator generator;
+    private static CodeGenerator codeGenerator;
+
+    @PostConstruct
+    public void init() {
+        codeGenerator = generator;
+    }
 
     /**
      * 生成三层代码 包含 仅生成dao层 （包含实体Entity及mapper接口及xml） 生成service层 （包含service接口及impl） 生成controller层
@@ -219,8 +231,11 @@ public class FreeMarkerGeneratorUtil {
 
         String file = outDir + "/" + filePrefix + dataModel.getEntityName() + fileSuffix;
         if (FileUtil.exist(file)) {
-            log.info("文件：{} 已存在，如需覆盖请先对该文件进行", file);
-            return;
+            boolean delete = FileUtil.del(file);
+            log.info("文件：{} 已存在，删除:{}", file, delete);
+            if (!delete) {
+                return;
+            }
         }
         //获取模板对象
         Configuration conf = new Configuration();
@@ -232,5 +247,138 @@ public class FreeMarkerGeneratorUtil {
         template.process(dataModel, writer);
         writer.close();
         log.info("代码生成成功，文件位置：{}", file);
+    }
+
+    private static Connection getConn(String driver, String url, String user, String pwd) {
+        Connection con = null;
+        //注册驱动
+        try {
+            Class.forName(driver);
+            con = DriverManager.getConnection(url, user, pwd);
+        } catch (Exception e) {
+            log.error("获取数据连接失败，{}", e.getMessage());
+        }
+        return con;
+    }
+
+    public static byte[] generator(String tableName) {
+        return generator(codeGenerator.getDriverClassName(),
+                codeGenerator.getUrl(),
+                codeGenerator.getUsername(),
+                codeGenerator.getPassword(),
+                tableName,
+                codeGenerator.getDatabaseName(),
+                codeGenerator.getTablePrefix());
+    }
+
+    public static byte[] generator(String driver, String url, String user, String pwd, String tableName, String databaseName,
+                                   String tablePrefix) {
+        Connection con = getConn(driver, url, user, pwd);
+        //查询dbName所有表
+        String sql = "select table_name from information_schema.tables where table_schema='" + databaseName + "'";
+        //获取当前项目路径
+        String path = FreeMarkerGeneratorUtil.class.getResource("/").getPath();
+        path = StrUtil.sub(path, 1, path.indexOf("/target"));
+        log.info("当前项目路径为：{}", path);
+        String parentProjectPath = StrUtil.sub(path, 0, path.lastIndexOf("/"));
+        //获取模板路径
+        String templatePath = path + "/src/main/java/com/system/springbootv1/common/templates";
+        log.info("当前模板路径为：{}", templatePath);
+        boolean onlySingleTable = StrUtil.isNotBlank(tableName);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ZipOutputStream zip = new ZipOutputStream(outputStream);
+
+        try {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                if (!onlySingleTable) {
+                    tableName = rs.getString(1);
+                }
+                String entityDir = autoCodePath();
+                //根据实体包名创建目录
+                if (!FileUtil.exist(entityDir)) {
+                    FileUtil.mkdir(entityDir);
+                    log.info("创建目录：{} 成功！ ", entityDir);
+                }
+
+                EntityDataModel entityModel = getEntityModel(con,
+                        tableName,
+                        codeGenerator.getBasePackage(),
+                        codeGenerator.getDaoPackage(),
+                        codeGenerator.getServicePackage(),
+                        codeGenerator.getControllerPackage(),
+                        tablePrefix);
+                //生成java文件
+                generateCode(entityModel, templatePath, "Entity.ftl", entityDir, "", ".java", zip);
+                generateCode(entityModel, templatePath, "EntityDao.ftl", entityDir, "I", "Dao.java", zip);
+                generateCode(entityModel, templatePath, "EntityService.ftl", entityDir, "", "Service.java", zip);
+                generateCode(entityModel, templatePath, "EntityController.ftl", entityDir, "", "Controller.java", zip);
+                generateCode(entityModel, templatePath, "EntityMapper.ftl", entityDir, "", "Mapper.xml", zip);
+                generateCode(entityModel, templatePath, "EntityApiController.ftl", entityDir, "", "ApiController.java", zip);
+                if (onlySingleTable) {
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("代码生成出错 {}", e.getMessage());
+        } finally {
+            try {
+                zip.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return outputStream.toByteArray();
+    }
+
+    private static void generateCode(EntityDataModel dataModel, String templatePath, String templateName, String outDir, String filePrefix, String fileSuffix, ZipOutputStream zip)
+            throws IOException, TemplateException {
+        if (fileSuffix.contains("xml")) {
+            dataModel.setInsertValue(handleSQL(dataModel.getColumns(), "insert"));
+            dataModel.setUpdateValue(handleSQL(dataModel.getColumns(), "update"));
+            dataModel.setStrColumn(handleSQL(dataModel.getColumns(), "columnList"));
+        }
+
+        String file = outDir + File.separator + filePrefix + dataModel.getEntityName() + fileSuffix;
+        if (FileUtil.exist(file)) {
+            boolean delete = FileUtil.del(file);
+            log.info("文件：{} 已存在，删除:{}", file, delete);
+            if (!delete) {
+                return;
+            }
+        }
+
+        //获取模板对象
+        Configuration conf = new Configuration();
+        File temp = new File(templatePath);
+        conf.setDirectoryForTemplateLoading(temp);
+        Template template = conf.getTemplate(templateName);
+        Writer writer = new FileWriter(file);
+        //填充数据模型
+        template.process(dataModel, writer);
+        writer.close();
+        log.info("代码生成成功，文件位置：{}", file);
+
+        FileInputStream inputStream = new FileInputStream(new File(file));
+        zip.putNextEntry(new ZipEntry(new File(file).getName()));
+        byte[] buffer = new byte[inputStream.available()];
+        int len;
+        while ((len = inputStream.read(buffer)) > 0) {
+            zip.write(buffer, 0, len);
+        }
+        zip.flush();
+        zip.closeEntry();
+        inputStream.close();
+    }
+
+
+    public static String autoCodePath() {
+        //获取当前项目路径
+        String path = FreeMarkerGeneratorUtil.class.getResource("/").getPath();
+        path = StrUtil.sub(path, 1, path.indexOf("/target"));
+        return path + File.separator + "autocode";
     }
 }

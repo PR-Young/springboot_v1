@@ -15,6 +15,7 @@ public class BaseConfig {
     private String version;
     private String copyright;
     private long timeout;
+    private boolean separate;
 
     public String getName() {
         return name;
@@ -46,5 +47,13 @@ public class BaseConfig {
 
     public void setTimeout(long timeout) {
         this.timeout = timeout;
+    }
+
+    public boolean isSeparate() {
+        return separate;
+    }
+
+    public void setSeparate(boolean separate) {
+        this.separate = separate;
     }
 }

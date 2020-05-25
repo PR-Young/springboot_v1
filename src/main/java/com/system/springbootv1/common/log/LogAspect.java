@@ -1,24 +1,31 @@
 package com.system.springbootv1.common.log;
 
+import com.alibaba.fastjson.JSON;
 import com.system.springbootv1.common.shiro.ShiroUtils;
-import com.system.springbootv1.model.SysLog;
-import com.system.springbootv1.model.SysUser;
-import com.system.springbootv1.service.SysLogService;
-import com.system.springbootv1.utils.ServletUtils;
-import com.system.springbootv1.utils.StringUtils;
+import com.system.springbootv1.project.model.SysLog;
+import com.system.springbootv1.project.model.SysUser;
+import com.system.springbootv1.project.service.SysLogService;
+import com.system.springbootv1.utils.*;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.HandlerMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * @description:
@@ -28,6 +35,7 @@ import java.lang.reflect.Method;
 @Component
 @EnableAsync
 public class LogAspect {
+    private static Logger logger = LoggerFactory.getLogger(LogAspect.class);
 
     @Resource
     SysLogService sysLogService;
@@ -36,11 +44,11 @@ public class LogAspect {
     public void logPointCut() {
     }
 
-    @Pointcut("execution(* com.system.springbootv1.controller.*.*(..))")
+    @Pointcut("bean(*Controller)")
     public void logPointCutController() {
     }
 
-    @Pointcut("execution(* com.system.springbootv1.service.*.*(..))")
+    @Pointcut("execution(* com.system.springbootv1.project.service.*.*(..))")
     public void logPointCutService() {
     }
 
@@ -56,6 +64,7 @@ public class LogAspect {
 
     @Async
     public void handleLog(JoinPoint joinPoint, Exception e) {
+        logger.info("用户行为日志记录开始！");
         SysLog sysLog = new SysLog();
         try {
             MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -65,42 +74,59 @@ public class LogAspect {
                 String value = annotation.value();
             }
             String url = ServletUtils.getRequest().getRequestURI();
-            String ip = getRealIp(ServletUtils.getRequest());
+            String ip = IpUtils.getIpAddr(ServletUtils.getRequest());
 
             SysUser currentUser = ShiroUtils.getUser();
             if (null != currentUser) {
                 sysLog.setHostIp(ip);
                 sysLog.setUrl(url);
                 sysLog.setUserName(currentUser.getUserName());
+                sysLog.setRequestMethod(ServletUtils.getRequest().getMethod());
                 if (null != e) {
                     sysLog.setNotes(StringUtils.substring(e.getMessage(), 0, 2000));
+                } else {
+                    setRequestValue(joinPoint, sysLog);
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            //logger.error(ex.getMessage());
+            sysLog.setNotes(StringUtils.substring(ex.getMessage(), 0, 2000));
         } finally {
-            sysLogService.insert(sysLog);
+            if (null != sysLog.getUrl()) {
+                ThreadPoolUtils.executorService.execute(new SaveLogThread(sysLog, sysLogService));
+            }
+            logger.info("用户行为日志记录结束！");
         }
     }
 
-    public String getRealIp(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
+    private void setRequestValue(JoinPoint joinPoint, SysLog sysLog) {
+        String requestMethod = sysLog.getRequestMethod();
+        if (HttpMethod.PUT.name().equals(requestMethod) || HttpMethod.POST.name().equals(requestMethod)) {
+            String params = argsArrayToString(joinPoint.getArgs());
+            sysLog.setOperParams(StringUtils.substring(params, 0, 2000));
+        } else {
+            Map<?, ?> paramsMap = (Map<?, ?>) ServletUtils.getRequest().getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+            sysLog.setOperParams(StringUtils.substring(paramsMap.toString(), 0, 2000));
         }
-        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_IP");
-        }
-        if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;
     }
 
+    /**
+     * 参数拼装
+     */
+    private String argsArrayToString(Object[] paramsArray) {
+        String params = "";
+        if (paramsArray != null && paramsArray.length > 0) {
+            for (int i = 0; i < paramsArray.length; i++) {
+                if (!isFilterObject(paramsArray[i])) {
+                    Object jsonObj = JSON.toJSON(paramsArray[i]);
+                    params += jsonObj.toString() + " ";
+                }
+            }
+        }
+        return params.trim();
+    }
+
+    public boolean isFilterObject(final Object o) {
+        return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse;
+    }
 }

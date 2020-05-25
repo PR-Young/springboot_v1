@@ -17,7 +17,8 @@ ${AnsiColor.BRIGHT_BLACK}
  ┃ ┫ ┫  ┃ ┫ ┫
  ┗━┻━┛　┗━┻━┛
 ${AnsiColor.BLUE}
-:::  ARES  :::
-::: version: V1.0.0 :::
+::: application name: ${ares.base.name}  :::
+::: application version: ${ares.base.version} :::
+::: copyright: ${ares.base.copyright} :::
 ::: spring-boot: ${spring-boot.formatted-version} :::
 

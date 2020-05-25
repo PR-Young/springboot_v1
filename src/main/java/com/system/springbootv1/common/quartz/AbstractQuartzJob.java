@@ -2,9 +2,9 @@ package com.system.springbootv1.common.quartz;
 
 
 import com.system.springbootv1.common.spring.SpringUtils;
-import com.system.springbootv1.model.SysQuartzJob;
-import com.system.springbootv1.model.SysQuartzJobLog;
-import com.system.springbootv1.service.SysQuartzJobLogService;
+import com.system.springbootv1.project.model.SysQuartzJob;
+import com.system.springbootv1.project.model.SysQuartzJobLog;
+import com.system.springbootv1.project.service.SysQuartzJobLogService;
 import com.system.springbootv1.utils.StringUtils;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -70,8 +70,8 @@ public abstract class AbstractQuartzJob implements Job {
         sysJobLog.setJobGroup(sysJob.getJobGroup());
         sysJobLog.setInvokeTarget(sysJob.getInvokeTarget());
         sysJobLog.setStartTime(startTime);
-        sysJobLog.setEndTime(new Date());
-        long runMs = sysJobLog.getEndTime().getTime() - sysJobLog.getStartTime().getTime();
+        sysJobLog.setFinishTime(new Date());
+        long runMs = sysJobLog.getFinishTime().getTime() - sysJobLog.getStartTime().getTime();
         sysJobLog.setJobMessage(sysJobLog.getJobName() + " 总共耗时：" + runMs + "毫秒");
         if (e != null) {
             sysJobLog.setStatus(ScheduleConstants.FAIL_STATUS);

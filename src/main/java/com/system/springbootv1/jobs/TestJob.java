@@ -14,4 +14,8 @@ public class TestJob {
     public void test() {
         logger.info("test job is running!");
     }
+
+    public void testHasParam(String param1, String param2) {
+        logger.info("job testHasParam(参数1:{},参数2:{}) is running! ", param1, param2);
+    }
 }

@@ -1,13 +1,18 @@
 package com.system.springbootv1.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.system.springbootv1.common.model.Constants;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -127,5 +132,33 @@ public class ServletUtils {
             map.put("sort", "`" + sort + "` " + sortOrder);
         }
         return map;
+    }
+
+    public static Map<String, Object> getParameter() {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            ServletInputStream inputStream = getRequest().getInputStream();
+            BufferedReader bufferedReader = null;
+            String line = null;
+            StringBuffer sb = new StringBuffer();
+            if (null != inputStream) {
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                while ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line);
+                }
+            }
+            map = JSON.parseObject(sb.toString(), Map.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    public static String getToken() {
+        String token = getRequest().getHeader(Constants.TOKEN);
+        if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX)) {
+            token = token.replace(Constants.TOKEN_PREFIX, "");
+        }
+        return token;
     }
 }
