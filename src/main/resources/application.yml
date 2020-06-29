@@ -14,7 +14,7 @@ spring:
     static-path-pattern: /static/**
   thymeleaf:
     mode: HTML5
-    prefix: classpath:/templates/
+    prefix: classpath:/templates/ares/
     suffix: .html
     #指定编码
     encoding: utf-8
@@ -76,6 +76,7 @@ mybatis:
   type-aliases-package: com.system.springbootV1.**.model
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
 #分页配置
 pagehelper:
   helperDialect: mysql
@@ -101,14 +102,14 @@ management:
       exposure:
         include: ["*"]
         exclude:
-info:
-  app:
-    name: @project.name@
-    description: @project.description@
-    version: @project.version@
-    encoding: @project.build.sourceEncoding@
-    java:
-      version: @java.version@
+#info:
+#  app:
+#    name: @project.name@
+#    description: @project.description@
+#    version: @project.version@
+#    encoding: @project.build.sourceEncoding@
+#    java:
+#      version: @java.version@
 
 #基本配置信息
 ares:

@@ -5,6 +5,8 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -158,5 +160,17 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         // 计算差多少秒//输出结果
         // long sec = diff % nd % nh % nm / ns;
         return day + "天" + hour + "小时" + min + "分钟";
+    }
+
+    public static String format(LocalDateTime dateTime) {
+        return format(dateTime, DATE_TIME_PATTERN);
+    }
+
+    public static String format(LocalDateTime dateTime, String pattern) {
+        if (dateTime != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+            return formatter.format(dateTime);
+        }
+        return null;
     }
 }

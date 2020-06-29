@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.system.springbootv1.project.dao.ISysTemplateDao">
+    <resultMap id="SysTemplate" type="com.system.springbootv1.project.model.SysTemplate">
+        <id column="Id" jdbcType="VARCHAR" property="id"/>
+        <result column="Name" jdbcType="VARCHAR" property="name"/>
+        <result column="Subject" jdbcType="VARCHAR" property="subject"/>
+        <result column="Text" jdbcType="VARCHAR" property="text"/>
+        <result column="Html" jdbcType="VARCHAR" property="html"/>
+        <result column="Params" jdbcType="VARCHAR" property="param"/>
+        <result column="Creator" jdbcType="VARCHAR" property="creator"/>
+        <result column="Modifier" jdbcType="VARCHAR" property="modifier"/>
+        <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="ModifyTime" jdbcType="TIMESTAMP" property="modifyTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `Id`,`Name`,`Subject`,`Text`,`Html`,`Params`,`Creator`,`Modifier`, `CreateTime`, `ModifyTime`
+    </sql>
+
+    <insert id="insert" parameterType="com.system.springbootv1.project.model.SysTemplate">
+        insert into `sys_template` (<include refid="Base_Column_List"/>)
+        values (
+        #{id,jdbcType=VARCHAR},
+        #{name,jdbcType=VARCHAR},
+        #{subject,jdbcType=VARCHAR},
+        #{text,jdbcType=VARCHAR},
+        #{html,jdbcType=VARCHAR},
+        #{param,jdbcType=VARCHAR},
+        #{creator,jdbcType=VARCHAR},
+        #{modifier,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP},
+        #{modifyTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.system.springbootv1.project.model.SysTemplate">
+        update `sys_template`
+        <set>
+            <if test="name!= null">
+                `Name`=#{name,jdbcType=VARCHAR},
+            </if>
+            <if test="subject!= null">
+                `Subject`=#{subject,jdbcType=VARCHAR},
+            </if>
+            <if test="text!= null">
+                `Text`=#{text,jdbcType=VARCHAR},
+            </if>
+            <if test="html!= null">
+                `Html`=#{html,jdbcType=VARCHAR},
+            </if>
+            <if test="param!= null">
+                `Params`=#{param,jdbcType=VARCHAR},
+            </if>
+            <if test="creator!= null">
+                `Creator`=#{creator,jdbcType=VARCHAR},
+            </if>
+            <if test="modifier!= null">
+                `Modifier`=#{modifier,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                `CreateTime` = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                `ModifyTime` = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where `Id` = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <delete id="deleteByIds" parameterType="java.util.List">
+        delete from `sys_template`
+        where `Id` in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="getById" parameterType="java.lang.String" resultMap="SysTemplate">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_template`
+        where `Id` = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <select id="list" parameterType="java.util.Map" resultMap="SysTemplate">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_template`
+        where 1=1
+        <if test="search != null">
+
+        </if>
+        <if test="sort != null">
+            order by ${sort}
+        </if>
+        <if test="sort == null">
+            order by `CreateTime` desc
+        </if>
+    </select>
+
+    <select id="selectList" parameterType="com.system.springbootv1.project.model.SysTemplate" resultMap="SysTemplate">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_template`
+        where 1=1
+        <if test="subject != null and subject != ''"><!-- 开始时间检索 -->
+            AND `Subject` like concat('%', #{name}, '%')
+        </if>
+        <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(`CreateTime`,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(`Create_time`,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+    </select>
+
+    <select id="getByName" parameterType="java.lang.String" resultMap="SysTemplate">
+        select
+        <include refid="Base_Column_List"/>
+        from `sys_template`
+        where `Name` = #{name,jdbcType=VARCHAR}
+    </select>
+</mapper>

@@ -11,7 +11,7 @@
         <result column="ModifyTime" jdbcType="TIMESTAMP" property="modifyTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-        `Id`, `RoleName`, `Description`,`Creator`, `CreateTime`, `Modifier,``ModifyTime`
+        `Id`, `RoleName`, `Description`,`Creator`, `CreateTime`, `Modifier`,`ModifyTime`
     </sql>
     <insert id="insert" parameterType="com.system.springbootv1.project.model.SysRole">
       insert into `sys_role` (`Id`, `RoleName`, `Description`, `Creator`, `CreateTime`, `Modifier,``ModifyTime`)

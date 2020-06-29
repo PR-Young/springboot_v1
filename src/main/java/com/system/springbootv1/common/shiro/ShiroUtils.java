@@ -3,8 +3,6 @@ package com.system.springbootv1.common.shiro;
 import com.system.springbootv1.common.exception.UserException;
 import com.system.springbootv1.project.model.SysUser;
 import com.system.springbootv1.utils.BeanUtils;
-import com.system.springbootv1.common.redis.RedisUtil;
-import com.system.springbootv1.utils.ServletUtils;
 import com.system.springbootv1.utils.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -48,18 +46,11 @@ public class ShiroUtils {
     public static SysUser getUser() throws Exception {
         SysUser user = null;
         Object obj = getSubjct().getPrincipal();
-        if (StringUtils.isNotNull(obj) && !(obj instanceof String)) {
+        if (StringUtils.isNotNull(obj)) {
             user = new SysUser();
             BeanUtils.copyBeanProp(user, obj);
         } else {
-            String token = ServletUtils.getToken();
-            Object object = RedisUtil.get(token);
-            if (null != object) {
-                user = new SysUser();
-                BeanUtils.copyBeanProp(user, object);
-            }else {
-                throw new UserException();
-            }
+            throw new UserException();
         }
         return user;
     }

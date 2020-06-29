@@ -31,11 +31,12 @@ public class TableSupport {
      * 封装分页对象
      */
     public static PageDomain getPageDomain() {
-        PageDomain pageDomain = new PageDomain();
-        pageDomain.setPageNum(ServletUtils.getParameterToInt(PAGE_NUM));
-        pageDomain.setPageSize(ServletUtils.getParameterToInt(PAGE_SIZE));
-        pageDomain.setOrderByColumn(ServletUtils.getParameter(ORDER_BY_COLUMN));
-        pageDomain.setIsAsc(ServletUtils.getParameter(IS_ASC));
+        PageDomain pageDomain = PageDomain.newInstance()
+                .withPageNum(ServletUtils.getParameterToInt(PAGE_NUM))
+                .withPageSize(ServletUtils.getParameterToInt(PAGE_SIZE))
+                .withOrderByColumn(ServletUtils.getParameter(ORDER_BY_COLUMN))
+                .withIsAsc(ServletUtils.getParameter(IS_ASC))
+                .build();
         return pageDomain;
     }
 

@@ -1,5 +1,8 @@
 package com.system.springbootv1.common.jwt;
 
+import com.system.springbootv1.common.spring.SpringUtils;
+import com.system.springbootv1.project.model.SysUser;
+import com.system.springbootv1.project.service.SysUserService;
 import org.apache.shiro.authc.AuthenticationToken;
 
 /**
@@ -16,7 +19,10 @@ public class JwtToken implements AuthenticationToken {
 
     @Override
     public Object getPrincipal() {
-        return token;
+        String userName = JwtUtil.getUsername(token);
+        SysUserService userService = SpringUtils.getBean(SysUserService.class);
+        SysUser user = userService.getUserByName(userName);
+        return user;
     }
 
     @Override

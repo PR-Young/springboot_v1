@@ -4,6 +4,7 @@ import com.system.springbootv1.common.autocode.FreeMarkerGeneratorUtil;
 import com.system.springbootv1.project.controller.BaseController;
 import com.system.springbootv1.project.model.page.TableDataInfo;
 import com.system.springbootv1.project.service.GeneratorService;
+import com.system.springbootv1.utils.DateUtils;
 import com.system.springbootv1.utils.ServletUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,8 +62,9 @@ public class GeneratorApiController extends BaseController {
      * 生成zip文件
      */
     private void genCode(HttpServletResponse response, byte[] data) throws IOException {
+        String date = DateUtils.dateTimeNow();
         response.reset();
-        response.setHeader("Content-Disposition", "attachment; filename=\"code.zip\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"code_" + date + ".zip\"");
         response.addHeader("Content-Length", "" + data.length);
         response.setContentType("application/octet-stream; charset=UTF-8");
         IOUtils.write(data, response.getOutputStream());

@@ -9,7 +9,9 @@ import com.system.springbootv1.utils.SqlUtil;
 import com.system.springbootv1.utils.StringUtils;
 import org.springframework.http.HttpStatus;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @description:
@@ -40,5 +42,25 @@ public class BaseController {
         rspData.setRows(list);
         rspData.setTotal(new PageInfo(list).getTotal());
         return rspData;
+    }
+
+    protected BaseController.MapBuilder buildMapBuilder() {
+        return new MapBuilder();
+    }
+
+    protected class MapBuilder {
+        Map<String, Object> map = new HashMap<>();
+
+        protected MapBuilder() {
+        }
+
+        public BaseController.MapBuilder addParam(String key, Object value) {
+            map.put(key, value);
+            return this;
+        }
+
+        public Map<String, Object> getMap() {
+            return map;
+        }
     }
 }

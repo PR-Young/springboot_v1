@@ -5,7 +5,10 @@ import com.system.springbootv1.common.shiro.ShiroUtils;
 import com.system.springbootv1.project.model.SysLog;
 import com.system.springbootv1.project.model.SysUser;
 import com.system.springbootv1.project.service.SysLogService;
-import com.system.springbootv1.utils.*;
+import com.system.springbootv1.utils.IpUtils;
+import com.system.springbootv1.utils.ServletUtils;
+import com.system.springbootv1.utils.StringUtils;
+import com.system.springbootv1.utils.ThreadPoolUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -28,7 +31,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * @description:
+ * @description: 用户日志记录 当前仅记录出错日志
  * @author: yy 2020/01/27
  **/
 @Aspect
@@ -54,9 +57,10 @@ public class LogAspect {
 
     @AfterReturning("logPointCutController()")
     public void doBefore(JoinPoint joinPoint) {
-        handleLog(joinPoint, null);
+        //handleLog(joinPoint, null);
     }
 
+    //出错时记录日志
     @AfterThrowing(value = "logPointCutController()", throwing = "e")
     public void doAfter(JoinPoint joinPoint, Exception e) {
         handleLog(joinPoint, e);
@@ -89,7 +93,6 @@ public class LogAspect {
                 }
             }
         } catch (Exception ex) {
-            //logger.error(ex.getMessage());
             sysLog.setNotes(StringUtils.substring(ex.getMessage(), 0, 2000));
         } finally {
             if (null != sysLog.getUrl()) {

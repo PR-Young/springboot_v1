@@ -156,7 +156,11 @@ public class FreeMarkerGeneratorUtil {
             String type = rs.getString("column_type");
             String comment = rs.getString("column_comment");
             String annotation = null;
-            if ("Id".equalsIgnoreCase(name) || "CreateTime".equalsIgnoreCase(name) || "ModifyTime".equalsIgnoreCase(name)) {
+            if ("Id".equalsIgnoreCase(name)
+                    || "CreateTime".equalsIgnoreCase(name)
+                    || "ModifyTime".equalsIgnoreCase(name)
+                    || "Creator".equalsIgnoreCase(name)
+                    || "Modifier".equalsIgnoreCase(name)) {
                 continue;
             }
             type = ColumnType.getJavaType(type);
@@ -197,9 +201,12 @@ public class FreeMarkerGeneratorUtil {
             case "insert":
                 sb.append("#{Id,jdbcType=VARCHAR},\n");
                 for (Column column : columns) {
-                    sb.append("#{").append(column.getColumnName()).append(",jdbcType=").append(column.getJdbcType()).append("},\n");
+                    sb.append("#{").append(column.getName()).append(",jdbcType=").append(column.getJdbcType()).append("},\n");
                 }
-                sb.append("#{createTime,jdbcType=TIMESTAMP},\n").append("#{modifyTime,jdbcType=TIMESTAMP}");
+                sb.append("#{creator,jdbcType=VARCHAR},\n")
+                        .append("#{createTime,jdbcType=TIMESTAMP},\n")
+                        .append("#{modifier,jdbcType=VARCHAR},\n")
+                        .append("#{modifyTime,jdbcType=TIMESTAMP}");
                 break;
             case "update":
                 for (Column column : columns) {
@@ -208,8 +215,14 @@ public class FreeMarkerGeneratorUtil {
                             .append(column.getJdbcType()).append("},").append("\n")
                             .append("</if>\n");
                 }
-                sb.append("<if test=\"createTime != null\">\n")
+                sb.append("<if test=\"creator != null\">\n")
+                        .append("`Creator` = #{creator,jdbcType=TIMESTAMP},\n")
+                        .append("</if>\n")
+                        .append("<if test=\"createTime != null\">\n")
                         .append("`CreateTime` = #{createTime,jdbcType=TIMESTAMP},\n")
+                        .append("</if>\n")
+                        .append("<if test=\"modifier != null\">\n")
+                        .append("`Modifier` = #{modifier,jdbcType=TIMESTAMP},\n")
                         .append("</if>\n")
                         .append("<if test=\"modifyTime != null\">\n")
                         .append("`ModifyTime` = #{modifyTime,jdbcType=TIMESTAMP},\n")

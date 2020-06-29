@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title> - python工具</title>
+
+    <link rel="shortcut icon" th:href="@{/static/ares/img/favicon.ico}">
+    <link th:href="@{/static/ares/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/static/ares/css/font-awesome.css}" rel="stylesheet">
+    <link th:href="@{/static/ares/css/animate.css}" rel="stylesheet">
+    <link th:href="@{/static/ares/css/style.css}" rel="stylesheet">
+    <link th:href="@{/static/ares/js/plugins/codemirror/lib/codemirror.css}" rel="stylesheet">
+    <link th:href="@{/static/ares/js/plugins/codemirror/addon/fold/foldgutter.css}" rel="stylesheet">
+    <link th:href="@{/static/ares/js/plugins/codemirror/addon/hint/show-hint.css}" rel="stylesheet">
+    <link th:href="@{/static/ares/js/plugins/codemirror/addon/lint/lint.css}" rel="stylesheet">
+    <link th:href="@{/static/ares/js/plugins/codemirror/theme/idea.css}" rel="stylesheet">
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <textarea id="code"></textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <h1>结果：</h1>
+        </div>
+        <div class="col-sm-6">
+            <button id="run" class="btn-primary"
+                    style="float: right;font-size: 30px;margin-top: 20px;margin-bottom: 10px;">执行
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <textarea id="result" style="width: 100%;height: 200px;"></textarea>
+        </div>
+    </div>
+</div>
+<!-- 全局js -->
+<script th:src="@{/static/ares/js/jquery.min.js}"></script>
+<script th:src="@{/static/ares/js/bootstrap.min.js}"></script>
+<script th:src="@{/static/ares/js/plugins/layer/layer.min.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/lib/codemirror.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/addon/comment/comment.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/addon/selection/active-line.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/keymap/sublime.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/addon/hint/show-hint.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/mode/python/python.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/addon/fold/foldcode.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/addon/fold/foldgutter.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/addon/fold/brace-fold.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/addon/fold/indent-fold.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/addon/fold/comment-fold.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/addon/edit/closebrackets.js}"></script>
+<script th:src="@{/static/ares/js/plugins/codemirror/addon/edit/matchbrackets.js}"></script>
+<!-- 自定义js -->
+<script th:src="@{/static/ares/js/content.js}"></script>
+<!--flotdemo-->
+<script type="text/javascript">
+    $(function () {
+        var el = document.getElementById("code");
+        var version = "# version: Python3\n\n";
+        var codeAreaTip = "# please edit your code here:\n";
+        var codeStart = "# code start\n\n";
+        var codeEnd = "# code end\n\n";
+        var codeTip = "# '''\n# This function is the entry of this program and\n# it must be return your answer of current question.\n# '''\n";
+        var code = "def solution():\n\tpass";
+        var initValue = version + codeAreaTip + codeStart + codeEnd + codeTip + code;
+        var myCodeMirror = CodeMirror.fromTextArea(el, {
+            mode: "python", // 语言模式
+            theme: "idea", // 主题
+            keyMap: "sublime", // 快键键风格
+            lineNumbers: true, // 显示行号
+            smartIndent: true, // 智能缩进
+            indentUnit: 4, // 智能缩进单位为4个空格长度
+            indentWithTabs: true, // 使用制表符进行智能缩进
+            lineWrapping: true, //
+            // 在行槽中添加行号显示器、折叠器、语法检测器
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+            foldGutter: true, // 启用行槽中的代码折叠
+            autofocus: true, // 自动聚焦
+            matchBrackets: true, // 匹配结束符号，比如"]、}"
+            autoCloseBrackets: true, // 自动闭合符号
+            styleActiveLine: true, // 显示选中行的样式
+        });
+        myCodeMirror.setSize('auto', '500px');
+        // 设置初始文本，这个选项也可以在fromTextArea中配置
+        myCodeMirror.setOption("value", initValue);
+        // 编辑器按键监听
+        myCodeMirror.on("keypress", function () {
+            // 显示智能提示
+            myCodeMirror.showHint(); // 注意，注释了CodeMirror库中show-hint.js第131行的代码（阻止了代码补全，同时提供智能提示）
+        });
+        $("#run").click(function () {
+            var data = myCodeMirror.getValue();
+            $.ajax({
+                cache: true,
+                type: "POST",
+                url: "/tool/run",
+                data: {"script": data},
+                async: false,
+                error: function (request) {
+                    $.modal.alertError("系统错误");
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        $("#result").val(data.data);
+                    }
+                }
+            });
+        });
+    });
+</script>
+</body>
+
+</html>

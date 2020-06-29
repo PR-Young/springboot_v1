@@ -28,7 +28,7 @@ public class ${entityName}ApiController extends BaseController {
     @RequestMapping("list")
     public TableDataInfo list(${entityName} ${entityName1}) {
         startPage();
-        List<${entityName}> ${entityName1}List = userService.selectUserList(${entityName1});
+        List<${entityName}> ${entityName1}List = ${entityName1}Service.list(${entityName1});
         return getDataTable(${entityName1}List);
     }
 
